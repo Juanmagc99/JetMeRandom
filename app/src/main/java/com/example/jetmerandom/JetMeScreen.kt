@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetmerandom.screens.SearchScreen
+import java.time.LocalDate
 
 
 enum class JetMeScreen() {
@@ -72,7 +73,8 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
         ) {
             composable(route = JetMeScreen.Search.name) {
                 SearchScreen(
-
+                    onStartDatePicked = { viewModel.setStartDatePicked(date = LocalDate.now()) },
+                    onEndDatePicked = { viewModel.setEndDatePicked(date = LocalDate.now()) },
                 )
             }
         }

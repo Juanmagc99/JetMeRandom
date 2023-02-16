@@ -1,5 +1,7 @@
 package com.example.jetmerandom.data
 
+import java.time.LocalDate
+
 data class SearchUiState(
 
     val origin: String = "",
@@ -14,7 +16,9 @@ data class SearchUiState(
 
     val qChilds: Int = 0,
 
-    val startPicker: Boolean = false
+    val startDate: LocalDate = LocalDate.now(),
+
+    val endDate: LocalDate = LocalDate.now()
 
     //val sortBy: SortType,
 )
