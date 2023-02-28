@@ -1,12 +1,9 @@
 package com.example.jetmerandom.screens
 
 import androidx.annotation.DrawableRes
-import androidx.annotation.FloatRange
 import androidx.annotation.StringRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -31,25 +28,38 @@ import java.time.LocalDate
 import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.SecureFlagPolicy
+import com.example.jetmerandom.screens.components.AutoCompleteSelect
 
 
 @Composable
 fun SearchScreen(
-    onStartDatePicked: (LocalDate) -> Unit = {},
-    onEndDatePicked: (LocalDate) -> Unit = {},
+    onSearchClicked: () -> Unit,
 ){
 
     var amountOfHours by remember {
         mutableStateOf("")
     }
 
+    var startDate by remember {
+        mutableStateOf(LocalDate.now())
+    }
+
+    var endDate by remember {
+        mutableStateOf(LocalDate.now().plusDays(4))
+    }
+
     val focusManager = LocalFocusManager.current
+
+    var price by remember { mutableStateOf(80.0f..300.0f) }
 
 
     Column (
@@ -63,7 +73,20 @@ fun SearchScreen(
 
         HeadOptions()
 
-        AutoCompleteSelect("Cities", cities)
+        AutoCompleteSelect(
+            "Cities",
+            cities,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions (
+                onNext = {
+                    focusManager.moveFocus(FocusDirection.Down)
+                }
+            )
+        )
+
 
         EditNumberField(
             modifier = Modifier
@@ -72,127 +95,54 @@ fun SearchScreen(
             onValueChange = {amountOfHours = it},
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions (
+                onDone = {
+                    focusManager.clearFocus()
+                }
             ),
             labelResourceId = R.string.hours_label,
             iconResourceId = R.drawable.baseline_access_time_24
         )
 
-        PriceRange()
+        PriceRange(
+            price = price,
+            onValueChange = {price = it}
+        )
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            DatePickerCalendar(label = "Start", onDatePicked = onStartDatePicked)
-            DatePickerCalendar(label = "End", onDatePicked = onEndDatePicked)
+            DatePickerCalendar(
+                label = "Start",
+                date = startDate,
+                onValueChange = { startDate = it },
+                minDate = startDate
+            )
+            DatePickerCalendar(
+                label = "End",
+                date = endDate,
+                onValueChange = { endDate = it },
+                minDate = startDate
+            )
         }
 
 
     }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun HeadOptions(){
-
-    var popupControl by remember { mutableStateOf(false) }
-
-   val popupProperties = PopupProperties(
-        dismissOnBackPress = true,
-        dismissOnClickOutside = true,
-        securePolicy = SecureFlagPolicy.SecureOff,
-        clippingEnabled = true,
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(width = 2.dp, color = Color.Blue),
-
-    ) {
-        TextButton(
-            onClick = { popupControl = !popupControl },
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_airplane_ticket_24),
-                contentDescription = null
-            )
-            Text(
-                text = "Direct flight",
-            )
-            Spacer(modifier = Modifier.width(70.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_face_24),
-                contentDescription = null
-            )
-            Text(
-                text = "2",
-
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_child_care_24),
-                contentDescription = null
-            )
-            Text(
-                text = "0",
-
-                )
-        }
-    }
-
-    if (popupControl) {
-        Popup (
-            onDismissRequest = {popupControl = false},
-            alignment = Alignment.BottomCenter,
-            properties = popupProperties,
-        ){
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(190.dp)
-                    .background(Color.LightGray, RoundedCornerShape(16.dp))
-            ){
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(text = "Direct flight")
-                    }
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(text = "Indirect flight")
-                    }
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(text = "Hola")
-                    }
-                    TextButton(onClick = { /*TODO*/ }) {
-                        Text(text = "Hola")
-                    }
-                }
-            }
-        }
-    }
-
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun PriceRange(
-
+    price: ClosedFloatingPointRange<Float>,
+    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit
 ){
     val range = 10.0f..500.0f
-    var price by remember { mutableStateOf(80.0f..300.0f) }
-
-
 
     Column() {
         RangeSlider(
             value = price,
             valueRange = range,
-            onValueChange = { price = it },
+            onValueChange =  onValueChange ,
             onValueChangeFinished = {/*TODO*/}
         )
         Row(
@@ -209,14 +159,182 @@ fun PriceRange(
         }
     }
 
+}
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun HeadOptions(){
+
+    var popupControl by remember { mutableStateOf(false) }
+
+    var nAdults by remember { mutableStateOf(2) }
+
+    var nChilds by remember { mutableStateOf(0) }
+
+   val popupProperties = PopupProperties(
+        dismissOnBackPress = true,
+        dismissOnClickOutside = true,
+        securePolicy = SecureFlagPolicy.SecureOff,
+        clippingEnabled = true,
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(width = 2.dp, color = Color.Blue),
+
+    ) {
+        TextButton(
+            onClick = { popupControl = true },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_airplane_ticket_24),
+                contentDescription = null
+            )
+            Text(
+                text = "Direct flight",
+            )
+            Spacer(modifier = Modifier.width(70.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_face_24),
+                contentDescription = null
+            )
+            Text(text = nAdults.toString())
+            Spacer(modifier = Modifier.width(10.dp))
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_child_care_24),
+                contentDescription = null
+            )
+            Text(text = nChilds.toString())
+        }
+    }
+
+    if (popupControl) {
+        Popup (
+            onDismissRequest = {popupControl = false},
+            alignment = Alignment.BottomStart,
+            properties = popupProperties,
+        ){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(280.dp)
+                    .background(Color.LightGray, RoundedCornerShape(16.dp))
+            ){
+                IconButton(
+                    onClick = { popupControl = false },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_cancel_24),
+                        contentDescription = null,
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
+                        .align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Spacer(Modifier.height(30.dp))
+                    TextButton(onClick = { /*TODO*/ }) {
+                        Text(
+                            text = "Direct flight",
+                            fontSize = 16.sp
+                        )
+                    }
+                    TextButton(onClick = { /*TODO*/ }) {
+                        Text(
+                            text = "Indirect flight",
+                            fontSize = 16.sp
+                        )
+                    }
+                    Divider(color = Color.Gray, thickness = 1.dp)
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                    ) {
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_add_24),
+                                contentDescription = null
+                            )
+                        }
+                        Spacer(Modifier.width(20.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_face_24),
+                            contentDescription = null
+                        )
+                        Text(
+                            text = nAdults.toString(),
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .padding(start = 5.dp)
+                        )
+                        Spacer(Modifier.width(20.dp))
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_remove_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                    ) {
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_add_24),
+                                contentDescription = null
+                            )
+                        }
+                        Spacer(Modifier.width(20.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_child_care_24),
+                            contentDescription = null
+                        )
+                        Text(
+                            text = nChilds.toString(),
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .padding(start = 5.dp)
+                        )
+                        Spacer(Modifier.width(20.dp))
+                        IconButton(
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_remove_24),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }
+
 
 @Composable
 fun DatePickerCalendar(
     label: String,
-    onDatePicked: (LocalDate) -> Unit,
+    date: LocalDate,
+    onValueChange: (LocalDate) -> Unit,
+    minDate: LocalDate
 ){
     var showPicker by remember {
         mutableStateOf(false)
@@ -228,10 +346,10 @@ fun DatePickerCalendar(
 
     Column() {
         Text(
-            text = stringDate,
+            text = date.toString(),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally),
-            color = Color.Gray
+            color = Color.DarkGray
         )
 
         OutlinedButton(
@@ -258,10 +376,10 @@ fun DatePickerCalendar(
 
         if (showPicker) {
             ComposeCalendar(
-                minDate = LocalDate.now(),
+                startDate = minDate,
+                minDate = minDate,
                 onDone = { it: LocalDate ->
                     showPicker = false
-                    onDatePicked(it)
                     stringDate = it.toString()
                 },
                 onDismiss = {
@@ -280,6 +398,7 @@ fun EditNumberField(
     value: String,
     onValueChange: (String) -> Unit,
     keyboardOptions: KeyboardOptions,
+    keyboardActions: KeyboardActions,
     @DrawableRes iconResourceId: Int,
 ){
     TextField(
@@ -296,77 +415,17 @@ fun EditNumberField(
                 contentDescription = null
             )
         },
+        keyboardActions = keyboardActions,
         modifier = modifier,
         maxLines = 1,
     )
 
 }
 
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun AutoCompleteSelect(label: String, options: List<String>){
-
-    var selectedItem by remember {
-        mutableStateOf("")
-    }
-
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded}
-    ) {
-        OutlinedTextField(
-            value = selectedItem,
-            onValueChange = { selectedItem = it },
-            label = {
-                Text(text = label)
-                    },
-            trailingIcon = {
-                if (!expanded){
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_search_24),
-                        contentDescription = "arrow up icon")
-                }else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_cancel_24),
-                        contentDescription = "search icon")
-                }
-            },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            maxLines = 1
-        )
-
-        val optionsFiltered =
-            options.filter { it.contains(selectedItem, ignoreCase = true) }
-
-        if (optionsFiltered.isNotEmpty()) {
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                optionsFiltered.forEach { selectionOption ->
-                    DropdownMenuItem(
-                        onClick = {
-                            selectedItem = selectionOption
-                            expanded = false
-                        }
-                    ) {
-                        Text(text = selectionOption)
-                    }
-                }
-            }
-        }
-    }
-
-}
-
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewSearch(){
-    SearchScreen(
-    )
+    SearchScreen {
+
+    }
 }

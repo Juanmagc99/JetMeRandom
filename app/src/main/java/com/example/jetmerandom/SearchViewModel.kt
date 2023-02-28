@@ -13,30 +13,24 @@ class SearchViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-
-    /*fun showStartDataPicker(showDatePicker: Boolean){
+    fun onSearchClicked(startDate: LocalDate,
+                        endDate: LocalDate,
+                        priceRange: ClosedFloatingPointRange<Float>,
+                        maxTime: Int,
+                        origin: String,
+                        isDirect: Boolean
+    ){
         _uiState.update { currentState ->
             currentState.copy(
-                startPicker = showDatePicker,
-            )
-        }
-    }*/
-
-    fun setStartDatePicked(date: LocalDate){
-        _uiState.update { currentState ->
-            currentState.copy(
-                startDate = date
-            )
-        }
-    }
-
-    fun setEndDatePicked(date: LocalDate){
-        _uiState.update { currentState ->
-            currentState.copy(
-                endDate = date
+                startDate = startDate,
+                endDate = endDate,
+                minPrice = priceRange.start,
+                maxPrice = priceRange.endInclusive,
+                maxTime = maxTime,
+                origin = origin,
+                isDirect = isDirect
             )
         }
     }
-
 
 }

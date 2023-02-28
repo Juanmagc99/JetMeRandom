@@ -72,10 +72,16 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
             modifier = modifier.padding(innerPadding)
         ) {
             composable(route = JetMeScreen.Search.name) {
-                SearchScreen(
-                    onStartDatePicked = { viewModel.setStartDatePicked(date = LocalDate.now()) },
-                    onEndDatePicked = { viewModel.setEndDatePicked(date = LocalDate.now()) },
-                )
+                SearchScreen {
+                    viewModel.onSearchClicked(
+                        isDirect = true,
+                        origin = "",
+                        maxTime = 4,
+                        startDate = LocalDate.now().plusDays(1),
+                        endDate = LocalDate.now().plusDays(4),
+                        priceRange = 80.0f..300.0f
+                    )
+                }
             }
         }
 

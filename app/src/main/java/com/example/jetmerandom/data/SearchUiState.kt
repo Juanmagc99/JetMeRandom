@@ -6,9 +6,9 @@ data class SearchUiState(
 
     val origin: String = "",
 
-    val minPrice: Double = 0.0,
+    val minPrice: Float = 10.0f,
 
-    val maxPrice: Double = 500.0,
+    val maxPrice: Float = 500.0f,
 
     val maxTime: Int = 20,
 
@@ -18,7 +18,9 @@ data class SearchUiState(
 
     val startDate: LocalDate = LocalDate.now(),
 
-    val endDate: LocalDate = LocalDate.now()
+    val endDate: LocalDate = LocalDate.now(),
+
+    val isDirect: Boolean = true
 
     //val sortBy: SortType,
 )
