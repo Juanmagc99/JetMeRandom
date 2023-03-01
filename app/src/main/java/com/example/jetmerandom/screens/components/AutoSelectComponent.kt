@@ -6,6 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import com.example.jetmerandom.R
+import com.example.jetmerandom.SearchViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -13,7 +14,8 @@ fun AutoCompleteSelect(
     label: String,
     options: List<String>,
     keyboardOptions: KeyboardOptions,
-    keyboardActions: KeyboardActions
+    keyboardActions: KeyboardActions,
+    viewModel: SearchViewModel
 ){
 
     var selectedItem by remember {
@@ -64,6 +66,7 @@ fun AutoCompleteSelect(
                         onClick = {
                             selectedItem = selectionOption
                             expanded = false
+                            viewModel.onOriginSelected(selectedItem)
                         }
                     ) {
                         Text(text = selectionOption)

@@ -1,5 +1,6 @@
 package com.example.jetmerandom
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.jetmerandom.data.SearchUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,23 +14,63 @@ class SearchViewModel: ViewModel() {
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
-    fun onSearchClicked(startDate: LocalDate,
-                        endDate: LocalDate,
+
+    fun onSearchClicked(
                         priceRange: ClosedFloatingPointRange<Float>,
                         maxTime: Int,
-                        origin: String,
                         isDirect: Boolean
     ){
         _uiState.update { currentState ->
             currentState.copy(
-                startDate = startDate,
-                endDate = endDate,
                 minPrice = priceRange.start,
                 maxPrice = priceRange.endInclusive,
                 maxTime = maxTime,
-                origin = origin,
                 isDirect = isDirect
             )
+        }
+    }
+
+    fun setDate(date: LocalDate, flag: String) {
+        val currentState = _uiState.value
+        if (flag == "Start"){
+            _uiState.value = currentState.copy(startDate = date)
+        } else {
+            _uiState.value = currentState.copy(endDate = date)
+        }
+    }
+
+    fun onEndDatePicked(endDate: LocalDate) {
+        _uiState.update { currentState ->
+            currentState.copy(
+                endDate = endDate,
+            )
+        }
+    }
+
+    fun setPriceRange(priceRange: ClosedFloatingPointRange<Float>){
+        val currentState = _uiState.value
+        val minPrice = priceRange.start
+        val maxPrice = priceRange.endInclusive
+        _uiState.value = currentState.copy(minPrice = minPrice)
+        _uiState.value = currentState.copy(maxPrice = maxPrice)
+    }
+
+    fun onOriginSelected(origin: String) {
+        val currentState = _uiState.value
+        _uiState.value = currentState.copy(origin = origin)
+    }
+
+    fun setIsDirect(isDirect: Boolean) {
+        val currentState = _uiState.value
+        _uiState.value = currentState.copy(isDirect = isDirect)
+    }
+
+    fun setPassenger(nPassenger: Int, flag: String) {
+        val currentState = _uiState.value
+        if (flag == "Adult"){
+            _uiState.value = currentState.copy(qAdults = nPassenger)
+        } else {
+            _uiState.value = currentState.copy(qChilds = nPassenger)
         }
     }
 

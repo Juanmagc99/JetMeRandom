@@ -2,5 +2,7 @@
     <string name="app_name">JetMeRandom</string>
     <string name="back_button">Back</string>
     <string name="hours_label">Hours</string>
+    <string name="direct_flight">Direct flight</string>
+    <string name="indirect_flight">Indirect flight</string>
 
 </resources>

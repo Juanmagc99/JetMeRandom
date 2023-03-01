@@ -37,30 +37,25 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.SecureFlagPolicy
+import com.example.jetmerandom.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
+import com.example.jetmerandom.screens.components.DatePickerCalendar
 
 
 @Composable
 fun SearchScreen(
-    onSearchClicked: () -> Unit,
+    viewModel: SearchViewModel
 ){
+
+    val state = viewModel.uiState.collectAsState().value
+
+    val focusManager = LocalFocusManager.current
 
     var amountOfHours by remember {
         mutableStateOf("")
     }
 
-    var startDate by remember {
-        mutableStateOf(LocalDate.now())
-    }
-
-    var endDate by remember {
-        mutableStateOf(LocalDate.now().plusDays(4))
-    }
-
-    val focusManager = LocalFocusManager.current
-
     var price by remember { mutableStateOf(80.0f..300.0f) }
-
 
     Column (
         modifier = Modifier
@@ -71,7 +66,9 @@ fun SearchScreen(
     ){
         Spacer(modifier = Modifier.padding(50.dp))
 
-        HeadOptions()
+        HeadOptions(
+            viewModel = viewModel
+        )
 
         AutoCompleteSelect(
             "Cities",
@@ -84,9 +81,11 @@ fun SearchScreen(
                 onNext = {
                     focusManager.moveFocus(FocusDirection.Down)
                 }
-            )
+            ),
+            viewModel = viewModel
         )
-
+        
+        Text(text = state.endDate.toString())
 
         EditNumberField(
             modifier = Modifier
@@ -108,21 +107,21 @@ fun SearchScreen(
 
         PriceRange(
             price = price,
-            onValueChange = {price = it}
+            onValueChange = {price = it},
         )
+
+
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DatePickerCalendar(
                 label = "Start",
-                date = startDate,
-                onValueChange = { startDate = it },
-                minDate = startDate
+                minDate = LocalDate.now(),
+                viewModel = viewModel
             )
             DatePickerCalendar(
                 label = "End",
-                date = endDate,
-                onValueChange = { endDate = it },
-                minDate = startDate
+                minDate = LocalDate.now().plusDays(1),
+                viewModel = viewModel
             )
         }
 
@@ -134,7 +133,7 @@ fun SearchScreen(
 @Composable
 fun PriceRange(
     price: ClosedFloatingPointRange<Float>,
-    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit
+    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
 ){
     val range = 10.0f..500.0f
 
@@ -142,8 +141,7 @@ fun PriceRange(
         RangeSlider(
             value = price,
             valueRange = range,
-            onValueChange =  onValueChange ,
-            onValueChangeFinished = {/*TODO*/}
+            onValueChange =  onValueChange,
         )
         Row(
             modifier = Modifier
@@ -163,7 +161,11 @@ fun PriceRange(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun HeadOptions(){
+fun HeadOptions(
+    viewModel: SearchViewModel
+){
+
+    val state = viewModel.uiState.collectAsState().value
 
     var popupControl by remember { mutableStateOf(false) }
 
@@ -189,25 +191,24 @@ fun HeadOptions(){
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_airplane_ticket_24),
-                contentDescription = null
-            )
-            Text(
-                text = "Direct flight",
-            )
+            if (state.isDirect){
+                IconWithText(
+                    stringResourceId = R.string.direct_flight,
+                    iconResourceId = R.drawable.baseline_airplane_ticket_24)
+            } else {
+                IconWithText(
+                    stringResourceId = R.string.indirect_flight,
+                    iconResourceId = R.drawable.baseline_airplane_ticket_24)
+            }
             Spacer(modifier = Modifier.width(70.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_face_24),
-                contentDescription = null
-            )
-            Text(text = nAdults.toString())
+            IconWithText(
+                value = state.qAdults.toString(),
+                iconResourceId = R.drawable.baseline_face_24)
+
             Spacer(modifier = Modifier.width(10.dp))
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_child_care_24),
-                contentDescription = null
-            )
-            Text(text = nChilds.toString())
+            IconWithText(
+                value = state.qChilds.toString(),
+                iconResourceId = R.drawable.baseline_child_care_24)
         }
     }
 
@@ -227,7 +228,6 @@ fun HeadOptions(){
                     onClick = { popupControl = false },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_cancel_24),
@@ -242,85 +242,27 @@ fun HeadOptions(){
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(Modifier.height(30.dp))
-                    TextButton(onClick = { /*TODO*/ }) {
+                    TextButton(onClick = { viewModel.setIsDirect(true) }) {
                         Text(
-                            text = "Direct flight",
+                            text = stringResource(id = R.string.direct_flight),
                             fontSize = 16.sp
                         )
                     }
-                    TextButton(onClick = { /*TODO*/ }) {
+                    TextButton(onClick = { viewModel.setIsDirect(false) }) {
                         Text(
-                            text = "Indirect flight",
+                            text = stringResource(id = R.string.indirect_flight),
                             fontSize = 16.sp
                         )
                     }
                     Divider(color = Color.Gray, thickness = 1.dp)
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-                    ) {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_add_24),
-                                contentDescription = null
-                            )
-                        }
-                        Spacer(Modifier.width(20.dp))
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_face_24),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = nAdults.toString(),
-                            fontSize = 18.sp,
-                            modifier = Modifier
-                                .padding(start = 5.dp)
-                        )
-                        Spacer(Modifier.width(20.dp))
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_remove_24),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-                    ) {
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_add_24),
-                                contentDescription = null
-                            )
-                        }
-                        Spacer(Modifier.width(20.dp))
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_child_care_24),
-                            contentDescription = null
-                        )
-                        Text(
-                            text = nChilds.toString(),
-                            fontSize = 18.sp,
-                            modifier = Modifier
-                                .padding(start = 5.dp)
-                        )
-                        Spacer(Modifier.width(20.dp))
-                        IconButton(
-                            onClick = { /*TODO*/ }
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.baseline_remove_24),
-                                contentDescription = null
-                            )
-                        }
-                    }
+                    PopUpRow(
+                        viewModel = viewModel,
+                        iconResourceId = R.drawable.baseline_face_24,
+                        ageGroup = "Adult")
+                    PopUpRow(
+                        viewModel = viewModel,
+                        iconResourceId = R.drawable.baseline_child_care_24,
+                        ageGroup = "Child")
                 }
             }
         }
@@ -328,68 +270,103 @@ fun HeadOptions(){
 
 }
 
-
 @Composable
-fun DatePickerCalendar(
-    label: String,
-    date: LocalDate,
-    onValueChange: (LocalDate) -> Unit,
-    minDate: LocalDate
+fun PopUpRow(
+    viewModel: SearchViewModel,
+    @DrawableRes iconResourceId: Int,
+    ageGroup: String
 ){
-    var showPicker by remember {
-        mutableStateOf(false)
-    }
 
-    var stringDate by remember {
-        mutableStateOf("")
-    }
+    val state = viewModel.uiState.collectAsState().value
 
-    Column() {
-        Text(
-            text = date.toString(),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally),
-            color = Color.DarkGray
+
+    Row(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+    ) {
+        IconButton(
+            onClick = {
+                if (ageGroup == "Adult" && state.qAdults > 0){
+                    viewModel.setPassenger(state.qAdults.dec(), ageGroup)
+                } else if (ageGroup == "Child" && state.qChilds > 0) {
+                    viewModel.setPassenger(state.qChilds.dec(), ageGroup)
+                }
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_remove_24),
+                contentDescription = null
+            )
+        }
+        Spacer(Modifier.width(20.dp))
+        Icon(
+            painter = painterResource(id = iconResourceId),
+            contentDescription = null
         )
 
-        OutlinedButton(
-            onClick = {
-                showPicker = true
-            },
-            contentPadding = PaddingValues(
-                start = 20.dp,
-                top = 12.dp,
-                end = 20.dp,
-                bottom = 12.dp
-            ),
-            modifier = Modifier.size(110.dp, 50.dp),
-            border = ButtonDefaults.outlinedBorder
-        ){
-            Icon(
-                Icons.Filled.DateRange,
-                contentDescription = "Date picker icon",
-
-                )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(text = label)
+        if (ageGroup == "Adult"){
+            Text(
+                text = state.qAdults.toString(),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+            )
+        } else {
+            Text(
+                text = state.qChilds.toString(),
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .padding(start = 5.dp)
+            )
         }
-
-        if (showPicker) {
-            ComposeCalendar(
-                startDate = minDate,
-                minDate = minDate,
-                onDone = { it: LocalDate ->
-                    showPicker = false
-                    stringDate = it.toString()
-                },
-                onDismiss = {
-                    showPicker = false
-                },
+        Spacer(Modifier.width(20.dp))
+        IconButton(
+            onClick = {
+                if (ageGroup == "Adult" && state.qAdults <= 10){
+                    viewModel.setPassenger(state.qAdults.inc(), ageGroup)
+                } else if (ageGroup == "Child" && state.qChilds <= 10) {
+                    viewModel.setPassenger(state.qChilds.inc(), ageGroup)
+                }
+            }
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_add_24),
+                contentDescription = null
             )
         }
     }
-
 }
+
+@Composable
+fun IconWithText(
+    @StringRes stringResourceId: Int,
+    @DrawableRes iconResourceId: Int,
+){
+    Icon(
+        painter = painterResource(id = iconResourceId),
+        contentDescription = null
+    )
+    Text(
+        text = stringResource(id = stringResourceId),
+    )
+}
+@Composable
+fun IconWithText(
+    value: String,
+    @DrawableRes iconResourceId: Int,
+){
+    Icon(
+        painter = painterResource(id = iconResourceId),
+        contentDescription = null
+    )
+    Text(
+        text = value,
+    )
+}
+
+
+
+
 
 @Composable
 fun EditNumberField(
@@ -425,7 +402,10 @@ fun EditNumberField(
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
 fun PreviewSearch(){
-    SearchScreen {
-
-    }
+    SearchScreen(
+        viewModel = SearchViewModel()
+        )
 }
+
+
+

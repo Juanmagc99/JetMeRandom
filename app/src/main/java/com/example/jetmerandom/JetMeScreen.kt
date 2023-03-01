@@ -28,7 +28,7 @@ fun JetMeRandomAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    currentScreen: String
+    currentScreen: String,
 ) {
     TopAppBar(
         title = { Text(stringResource(id = R.string.app_name)) },
@@ -45,6 +45,7 @@ fun JetMeRandomAppBar(
         }
     )
 }
+
 
 @Composable
 fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel()){
@@ -72,16 +73,9 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
             modifier = modifier.padding(innerPadding)
         ) {
             composable(route = JetMeScreen.Search.name) {
-                SearchScreen {
-                    viewModel.onSearchClicked(
-                        isDirect = true,
-                        origin = "",
-                        maxTime = 4,
-                        startDate = LocalDate.now().plusDays(1),
-                        endDate = LocalDate.now().plusDays(4),
-                        priceRange = 80.0f..300.0f
-                    )
-                }
+                SearchScreen (
+                    viewModel = viewModel
+                )
             }
         }
 
