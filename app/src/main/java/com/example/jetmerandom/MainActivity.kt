@@ -3,24 +3,45 @@ package com.example.jetmerandom
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.jetmerandom.data.DataSource.cities
+
 import com.example.jetmerandom.ui.theme.JetMeRandomTheme
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        chargeLocations()
+
         setContent {
             JetMeRandomTheme {
                 JetMeRandomApp()
             }
         }
     }
+
+    fun chargeLocations(){
+        val csvInput = InputStreamReader(assets.open("airports.csv"))
+        val reader = BufferedReader(csvInput)
+
+        reader.readLine()
+        var lines: List<String> = reader.readLines()
+
+        lines.forEach {
+            val row : List<String> = it.split(";")
+            val city = row[10]
+            val code = row[13]
+            if(row[7] == "EU" && code != "" && city != "" && row[8] == "ES"){
+                cities.add("$code - $city")
+                println("$code - $city")
+            }
+        }
+
+    }
+
 }
 
 

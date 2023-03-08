@@ -1,12 +1,20 @@
 package com.example.jetmerandom.screens.components
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jetmerandom.R
 import com.example.jetmerandom.SearchViewModel
+import com.example.jetmerandom.data.DataSource.cities
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -66,7 +74,7 @@ fun AutoCompleteSelect(
                         onClick = {
                             selectedItem = selectionOption
                             expanded = false
-                            viewModel.onOriginSelected(selectedItem)
+                            viewModel.setOrigin(selectedItem)
                         }
                     ) {
                         Text(text = selectionOption)
@@ -74,6 +82,14 @@ fun AutoCompleteSelect(
                 }
             }
         }
+    }
+
+    if (!cities.contains(selectedItem) && selectedItem.isNotBlank()){
+        Text(
+            text = stringResource(R.string.origin_error_message),
+            color = Color.Red,
+            fontSize = 12.sp
+        )
     }
 
 }

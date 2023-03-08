@@ -73,6 +73,14 @@ fun HeadOptions(
         }
     }
 
+    if (!state.checkPassengers){
+        Text(
+            text = "The total nº of passenger cant be 0",
+            color = Color.Red,
+            fontSize = 12.sp
+        )
+    }
+
     if (popupControl) {
         Popup (
             onDismissRequest = {popupControl = false},

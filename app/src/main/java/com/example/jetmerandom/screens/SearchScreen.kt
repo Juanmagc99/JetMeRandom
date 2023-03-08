@@ -1,16 +1,12 @@
 package com.example.jetmerandom.screens
 
 import HeadOptions
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,20 +21,15 @@ import androidx.compose.ui.unit.dp
 import com.example.jetmerandom.R
 import com.example.jetmerandom.data.DataSource.cities
 
-import com.squaredem.composecalendar.ComposeCalendar
 import java.time.LocalDate
 import kotlin.math.roundToInt
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupProperties
-import androidx.compose.ui.window.SecureFlagPolicy
 import com.example.jetmerandom.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
 import com.example.jetmerandom.screens.components.DatePickerCalendar
@@ -67,7 +58,7 @@ fun SearchScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ){
 
-        Spacer(modifier = Modifier.padding(20.dp))
+        Spacer(modifier = Modifier.padding(10.dp))
 
         HeadOptions(
             viewModel = viewModel
@@ -76,7 +67,7 @@ fun SearchScreen(
         Spacer(modifier = Modifier.padding(5.dp))
 
         AutoCompleteSelect(
-            "Cities",
+            "From",
             cities,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -103,10 +94,12 @@ fun SearchScreen(
             keyboardActions = KeyboardActions (
                 onDone = {
                     focusManager.clearFocus()
+                    viewModel.setMaxHours(amountOfHours.toInt())
                 }
             ),
             labelResourceId = R.string.hours_label,
-            iconResourceId = R.drawable.baseline_access_time_24
+            iconResourceId = R.drawable.baseline_access_time_24,
+            viewModel = viewModel
         )
 
         Spacer(modifier = Modifier.padding(5.dp))
@@ -128,21 +121,27 @@ fun SearchScreen(
                 )
                 DatePickerCalendar(
                     label = "End",
-                    minDate = LocalDate.now().plusDays(1),
+                    minDate = state.startDate,
                     viewModel = viewModel
                 )
             }
 
             if(!state.checkDates){
                 Text(
-                    text = "Start date must be before end date",
+                    text = stringResource(R.string.date_error_message),
                     color = Color.Red,
                     fontSize = 12.sp
                 )
             }
         }
 
-        Button(onClick = { /*TODO*/ }) {
+        Spacer(modifier = Modifier.padding(5.dp))
+
+        Button(
+            onClick = {
+                      println("Hola")
+            },
+        ) {
             Text(text = "Search", fontSize = 22.sp)
             Icon(painter = painterResource(id = R.drawable.baseline_navigate_next_24),
                 contentDescription = null)
@@ -189,26 +188,42 @@ fun EditNumberField(
     onValueChange: (String) -> Unit,
     keyboardOptions: KeyboardOptions,
     keyboardActions: KeyboardActions,
+    viewModel: SearchViewModel,
     @DrawableRes iconResourceId: Int,
 ){
-    TextField(
-        label = {
-            Text(text = stringResource(id = labelResourceId))
-                },
-        value = value,
-        onValueChange = onValueChange,
-        singleLine = true,
-        keyboardOptions = keyboardOptions,
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = iconResourceId),
-                contentDescription = null
-            )
-        },
-        keyboardActions = keyboardActions,
-        modifier = modifier,
-        maxLines = 1,
-    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        TextField(
+            label = {
+                Text(text = stringResource(id = labelResourceId))
+            },
+            value = value,
+            onValueChange = onValueChange,
+            singleLine = true,
+            keyboardOptions = keyboardOptions,
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = iconResourceId),
+                    contentDescription = null
+                )
+            },
+            keyboardActions = keyboardActions,
+            modifier = modifier,
+            maxLines = 1,
+        )
+
+       if (!viewModel.uiState.collectAsState().value.checkHours){
+           Text(
+               text = "Cant input a negative nº of hours",
+               color = Color.Red,
+               fontSize = 12.sp
+           )
+       }
+    }
+
 
 }
 

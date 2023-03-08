@@ -22,7 +22,14 @@ data class SearchUiState(
 
     val isDirect: Boolean = true,
 
-    val checkDates: Boolean = true
+    val checkDates: Boolean = true,
 
-    //val sortBy: SortType,
+    val checkCityExists: Boolean = true,
+
+    val checkCityIsntBlank: Boolean = true,
+
+    val checkPassengers: Boolean = true,
+
+    val checkHours: Boolean = true
+
 )

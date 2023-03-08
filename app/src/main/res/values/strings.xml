@@ -4,5 +4,7 @@
     <string name="hours_label">Max hours</string>
     <string name="direct_flight">Direct flight</string>
     <string name="indirect_flight">Indirect flight</string>
+    <string name="date_error_message">End date cant be before start date</string>
+    <string name="origin_error_message">Cant found this airport</string>
 
 </resources>

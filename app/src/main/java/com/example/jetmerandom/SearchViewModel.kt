@@ -1,7 +1,9 @@
 package com.example.jetmerandom
 
-import androidx.compose.runtime.mutableStateOf
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.SearchUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,20 +17,61 @@ class SearchViewModel: ViewModel() {
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
 
-    fun onSearchClicked(
-                        priceRange: ClosedFloatingPointRange<Float>,
-                        maxTime: Int,
-                        isDirect: Boolean
-    ){
-        _uiState.update { currentState ->
-            currentState.copy(
-                minPrice = priceRange.start,
-                maxPrice = priceRange.endInclusive,
-                maxTime = maxTime,
-                isDirect = isDirect
-            )
+
+
+    fun checkDates(){
+        val currentState = _uiState.value
+        val start = uiState.value.startDate
+        val end = uiState.value.endDate
+
+        if (start.isBefore(end) || start.isEqual(end)) {
+            _uiState.value = currentState.copy(checkDates = true)
+        } else {
+            _uiState.value = currentState.copy(checkDates = false)
         }
     }
+
+    fun checkAndSearch(context: Context){
+
+    }
+
+    fun checkPassengers(){
+        val currentState = _uiState.value
+        if (uiState.value.qAdults + uiState.value.qChilds > 0){
+            _uiState.value = currentState.copy(checkPassengers = true)
+        } else {
+            _uiState.value = currentState.copy(checkPassengers = false)
+        }
+    }
+
+    fun checkOrigin(){
+        val currentState = _uiState.value
+        val actualCity = uiState.value.origin
+
+        if (!DataSource.cities.contains(actualCity) && actualCity.isNotBlank()){
+            _uiState.value = currentState.copy(checkCityExists = false)
+        } else {
+            _uiState.value = currentState.copy(checkCityExists = true)
+        }
+
+        if (actualCity.isBlank()){
+            _uiState.value = currentState.copy(checkCityIsntBlank = true)
+        } else {
+            _uiState.value = currentState.copy(checkCityIsntBlank = false)
+        }
+    }
+
+    fun checkTime(){
+        val currentState = _uiState.value
+        val maxTime = uiState.value.maxTime
+
+        if(maxTime <= 0){
+            _uiState.value = currentState.copy(checkHours = false)
+        } else {
+            _uiState.value = currentState.copy(checkHours = true)
+        }
+    }
+
 
     fun setDate(date: LocalDate, flag: String) {
         val currentState = _uiState.value
@@ -41,16 +84,11 @@ class SearchViewModel: ViewModel() {
         checkDates()
     }
 
-    fun checkDates(){
+    fun setMaxHours(maxTime: Int){
         val currentState = _uiState.value
-        val start = uiState.value.startDate
-        val end = uiState.value.endDate
+        _uiState.value = currentState.copy(maxTime = maxTime)
 
-        if (start.isBefore(end)) {
-            _uiState.value = currentState.copy(checkDates = true)
-        } else {
-            _uiState.value = currentState.copy(checkDates = false)
-        }
+        checkTime()
     }
 
     fun setPriceRange(priceRange: ClosedFloatingPointRange<Float>){
@@ -61,9 +99,11 @@ class SearchViewModel: ViewModel() {
         _uiState.value = currentState.copy(maxPrice = maxPrice)
     }
 
-    fun onOriginSelected(origin: String) {
+    fun setOrigin(origin: String) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(origin = origin)
+
+        checkOrigin()
     }
 
     fun setIsDirect(isDirect: Boolean) {
@@ -78,6 +118,8 @@ class SearchViewModel: ViewModel() {
         } else {
             _uiState.value = currentState.copy(qChilds = nPassenger)
         }
+
+        checkPassengers()
     }
 
 }
