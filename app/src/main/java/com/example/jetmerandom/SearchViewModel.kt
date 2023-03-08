@@ -37,13 +37,19 @@ class SearchViewModel: ViewModel() {
         } else {
             _uiState.value = currentState.copy(endDate = date)
         }
+
+        checkDates()
     }
 
-    fun onEndDatePicked(endDate: LocalDate) {
-        _uiState.update { currentState ->
-            currentState.copy(
-                endDate = endDate,
-            )
+    fun checkDates(){
+        val currentState = _uiState.value
+        val start = uiState.value.startDate
+        val end = uiState.value.endDate
+
+        if (start.isBefore(end)) {
+            _uiState.value = currentState.copy(checkDates = true)
+        } else {
+            _uiState.value = currentState.copy(checkDates = false)
         }
     }
 

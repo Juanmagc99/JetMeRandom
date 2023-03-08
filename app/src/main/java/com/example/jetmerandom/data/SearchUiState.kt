@@ -20,7 +20,9 @@ data class SearchUiState(
 
     val endDate: LocalDate = LocalDate.now(),
 
-    val isDirect: Boolean = true
+    val isDirect: Boolean = true,
+
+    val checkDates: Boolean = true
 
     //val sortBy: SortType,
 )
