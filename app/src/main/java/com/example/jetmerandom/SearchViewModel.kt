@@ -3,12 +3,18 @@ package com.example.jetmerandom
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.example.jetmerandom.API.APIService
 import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.SearchUiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
 
 class SearchViewModel: ViewModel() {
@@ -17,7 +23,35 @@ class SearchViewModel: ViewModel() {
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
 
+    fun getRetrofit(): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://api.tequila.kiwi.com/v2/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
+    fun getFlights() {
+        CoroutineScope(Dispatchers.IO).launch{
+            val call = getRetrofit().create(APIService::class.java).getFlights(
+                apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
+                fly_from = "SVQ",
+                fly_to = "MAD",
+                date_from = "01/04/2023",
+                date_to = "01/04/2023",
+                return_from = "03/04/2023",
+                return_to = "03/04/2023"
+            )
+            val flights = call.body()?.data?.get(0)
+            if (call.isSuccessful){
+                println("LLamada exitosa")
+                println(flights)
+            } else {
+                println("Llamada erronea")
+            }
+        }
+
+
+    }
 
     fun checkDates(){
         val currentState = _uiState.value

@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.sp
 import com.example.jetmerandom.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
 import com.example.jetmerandom.screens.components.DatePickerCalendar
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 @Composable
@@ -49,6 +51,8 @@ fun SearchScreen(
     }
 
     var price by remember { mutableStateOf(80.0f..300.0f) }
+
+
 
     Column (
         modifier = Modifier
@@ -139,7 +143,7 @@ fun SearchScreen(
 
         Button(
             onClick = {
-                      println("Hola")
+                      viewModel.getFlights()
             },
         ) {
             Text(text = "Search", fontSize = 22.sp)
