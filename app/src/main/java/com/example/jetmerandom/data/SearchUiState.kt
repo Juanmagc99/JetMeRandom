@@ -30,6 +30,7 @@ data class SearchUiState(
 
     val checkPassengers: Boolean = true,
 
-    val checkHours: Boolean = true
+    val checkHours: Boolean = true,
+
 
 )

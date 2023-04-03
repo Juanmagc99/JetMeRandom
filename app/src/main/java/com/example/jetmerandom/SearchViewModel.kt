@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import com.example.jetmerandom.API.APIService
 import com.example.jetmerandom.data.DataSource
+import com.example.jetmerandom.data.DataSource.flights
 import com.example.jetmerandom.data.SearchUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,8 @@ import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
+import java.util.function.Predicate
+import kotlin.streams.toList
 
 class SearchViewModel: ViewModel() {
 
@@ -34,23 +37,34 @@ class SearchViewModel: ViewModel() {
         CoroutineScope(Dispatchers.IO).launch{
             val call = getRetrofit().create(APIService::class.java).getFlights(
                 apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
-                fly_from = "SVQ",
-                fly_to = "MAD",
-                date_from = "01/04/2023",
-                date_to = "01/04/2023",
-                return_from = "03/04/2023",
-                return_to = "03/04/2023"
+                fly_from = "MAD",
+                fly_to = "LCY",
+                date_from = "04/05/2023",
+                date_to = "08/05/2023",
+                return_from = "10/04/2023",
+                return_to = "20/04/2023",
+                limit = "10",
             )
-            val flights = call.body()?.data?.get(0)
+            //val flights = call.body()?.data?.get(1)
             if (call.isSuccessful){
                 println("LLamada exitosa")
-                println(flights)
+                val flights_to_add = call.body()?.data
+                val flights_filtered = flights_to_add
+                    ?.stream()
+                    ?.filter(Predicate { f -> f.availability.seats >= uiState.value.qChilds + uiState.value.qAdults })
+                    ?.toList()
+                if (flights_filtered != null) {
+                    if(flights_filtered.isNotEmpty()){
+                        for (f in flights_filtered){
+                            flights.add(f)
+                        }
+                    }
+                }
             } else {
                 println("Llamada erronea")
             }
         }
-
-
+        
     }
 
     fun checkDates(){

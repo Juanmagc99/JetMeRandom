@@ -19,6 +19,7 @@ interface APIService {
         @Query("date_to") date_to:String,
         @Query("rerturn_from") return_from:String,
         @Query("rerturn_to") return_to:String,
+        @Query("limit") limit:String,
         @Header("apikey") apiKey: String,
     ): Response<FlightsResponse>
 

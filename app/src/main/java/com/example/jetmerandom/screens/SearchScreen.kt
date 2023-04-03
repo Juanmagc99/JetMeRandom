@@ -33,13 +33,19 @@ import androidx.compose.ui.unit.sp
 import com.example.jetmerandom.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
 import com.example.jetmerandom.screens.components.DatePickerCalendar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.android.awaitFrame
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel
+    viewModel: SearchViewModel,
+    onNextButtonClicked: () -> Unit = {},
 ){
 
     val state = viewModel.uiState.collectAsState().value
@@ -143,7 +149,13 @@ fun SearchScreen(
 
         Button(
             onClick = {
-                      viewModel.getFlights()
+                    viewModel.getFlights()
+                    runBlocking {
+                        delay(2000)
+                    }
+
+                    onNextButtonClicked()
+
             },
         ) {
             Text(text = "Search", fontSize = 22.sp)

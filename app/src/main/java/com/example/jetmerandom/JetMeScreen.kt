@@ -74,6 +74,12 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
         ) {
             composable(route = JetMeScreen.Search.name) {
                 SearchScreen (
+                    viewModel = viewModel,
+                    onNextButtonClicked = {navController.navigate(JetMeScreen.Listing.name)}
+                )
+            }
+            composable(route = JetMeScreen.Listing.name) {
+                ListinScreen(
                     viewModel = viewModel
                 )
             }

@@ -4,5 +4,6 @@ object DataSource {
 
     val cities = mutableListOf<String>()
 
+    val flights = mutableListOf<Data>()
 
 }
