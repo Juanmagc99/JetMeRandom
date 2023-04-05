@@ -6,5 +6,6 @@
     <string name="indirect_flight">Indirect flight</string>
     <string name="date_error_message">End date cant be before start date</string>
     <string name="origin_error_message">Cant found this airport</string>
+    <string name="expand_card">Expand flight card</string>
 
 </resources>

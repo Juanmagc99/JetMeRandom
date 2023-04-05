@@ -149,12 +149,7 @@ fun SearchScreen(
 
         Button(
             onClick = {
-                    viewModel.getFlights()
-                    runBlocking {
-                        delay(2000)
-                    }
-
-                    onNextButtonClicked()
+                    viewModel.getFlights(onNextButtonClicked)
 
             },
         ) {

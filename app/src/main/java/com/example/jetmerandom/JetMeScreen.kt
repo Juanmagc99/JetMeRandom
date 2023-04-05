@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.jetmerandom.screens.DetailsScreen
 import com.example.jetmerandom.screens.SearchScreen
 import java.time.LocalDate
 
@@ -80,6 +81,14 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
             }
             composable(route = JetMeScreen.Listing.name) {
                 ListinScreen(
+                    viewModel = viewModel,
+                    onDetailsClicked = {
+                        navController.navigate(JetMeScreen.Details.name)
+                    }
+                )
+            }
+            composable(route = JetMeScreen.Details.name) {
+                DetailsScreen(
                     viewModel = viewModel
                 )
             }

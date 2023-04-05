@@ -32,5 +32,7 @@ data class SearchUiState(
 
     val checkHours: Boolean = true,
 
+    val flight: Flight? = null
+
 
 )
