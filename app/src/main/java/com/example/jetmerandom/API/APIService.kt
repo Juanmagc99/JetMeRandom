@@ -31,7 +31,7 @@ interface APIService {
         @Path("city_name") city_name:String,
     ): Response<ImageResponse>
 
-    @GET("http://api.positionstack.com/v1/forward?access_key=e4b9d40ee5bd077711b0d8ef32bbc534")
+    @GET("http://api.positionstack.com/v1/forward?access_key=")
     suspend fun getCitiesLocation(
         @Query("query") city_name:String,
     ): Response<LocationResponse>
