@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
             val code = row[13]
             if(row[7] == "EU" && code != "" && city != "" && row[8] == "ES"){
                 cities.add("$code - $city")
-                println("$code - $city")
             }
         }
 

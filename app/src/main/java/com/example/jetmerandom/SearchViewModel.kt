@@ -35,23 +35,29 @@ class SearchViewModel: ViewModel() {
             .build()
     }
 
-    fun getFlightRoute() {
+    fun getFlightRoute(onDetailsButtonClicked: () -> Unit = {}) {
         routesLocation.clear()
         val flight = uiState.value.flight
         CoroutineScope(Dispatchers.IO).launch {
             val call = getRetrofit().create(APIService::class.java)
             for (r in flight!!.routes){
-                val location_departure_call = call.getCitiesLocation(r.cityCodeFrom)
-                val location_arrival_call = call.getCitiesLocation(r.cityCodeTo)
+                val location_departure_call = call.getCitiesLocation(r.cityCodeFrom + " " + r.cityFrom)
+                println(location_departure_call)
+                val location_arrival_call = call.getCitiesLocation(r.cityCodeTo + " " + r.cityTo)
                 println(location_arrival_call)
                 if (location_departure_call.isSuccessful && location_arrival_call.isSuccessful){
                     print("Funciona")
                     val locationDeparture = location_departure_call.body()?.data?.get(0)
                     val locationArrival = location_arrival_call.body()?.data?.get(0)
                     if (locationDeparture != null && locationArrival != null) {
-                        routesLocation.add(LatLng(locationDeparture.latitude,locationDeparture.longitude))
-                        routesLocation.add(LatLng(locationArrival.latitude,locationArrival.longitude))
+                        routesLocation[r.cityFrom] = LatLng(locationDeparture.latitude,locationDeparture.longitude)
+                        routesLocation[r.cityTo] = LatLng(locationArrival.latitude,locationArrival.longitude)
                     }
+                    withContext(Dispatchers.Main){
+                        onDetailsButtonClicked()
+                    }
+                }else {
+                    println("\n\nFALLO EN EL SERVIDOR NO SE HAN ENCONTRADO LAS COORDENADAS\n\n")
                 }
             }
             println(routesLocation)
@@ -64,10 +70,10 @@ class SearchViewModel: ViewModel() {
             val call = getRetrofit().create(APIService::class.java).getFlights(
                 apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
                 fly_from = "MAD",
-                date_from = "09/05/2023",
-                date_to = "18/05/2023",
-                return_from = "20/05/2023",
-                return_to = "28/05/2023",
+                date_from = "15/05/2023",
+                date_to = "25/05/2023",
+                return_from = "28/05/2023",
+                return_to = "10/06/2023",
                 flight_type = "round",
                 nights_in_dst_from = 2,
                 nights_in_dst_to = 20,

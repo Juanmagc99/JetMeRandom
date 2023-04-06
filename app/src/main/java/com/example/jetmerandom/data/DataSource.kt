@@ -8,5 +8,5 @@ object DataSource {
 
     val flights = mutableListOf<Flight>()
 
-    val routesLocation = mutableListOf<LatLng>()
+    val routesLocation = mutableMapOf<String,LatLng>()
 }

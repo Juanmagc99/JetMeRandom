@@ -98,22 +98,12 @@ fun FlightItem(flight: Flight,onDetailsClicked: () -> Unit = {}, viewModel: Sear
                 CardRoute(flight = flight)
                 Button(onClick = {
                     viewModel.setFligthDetails(flight)
-                    viewModel.getFlightRoute()
-                    onDetailsClicked()
+                    viewModel.getFlightRoute(onDetailsClicked)
                 },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                 ) {
                     Text(text = "Details")
-                }
-                Button(onClick = {
-                    viewModel.setFligthDetails(flight)
-                    viewModel.getFlightRoute()
-                },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Text(text = "Prueba")
                 }
             }
         }

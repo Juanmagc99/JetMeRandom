@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.jetmerandom.data.Flight
+import com.example.jetmerandom.data.Route
 
 @Composable
 fun CardRoute(flight: Flight){
@@ -34,6 +35,23 @@ fun CardRoute(flight: Flight){
             cityTo = flight.routes.last().cityTo,
             departure = flight.routes.last().utc_departure.split("T")[1].dropLast(5),
             arrival = flight.routes.last().utc_arrival.split("T")[1].dropLast(5)
+        )
+    }
+}
+
+@Composable
+fun CardRouteUniversal(route: Route){
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .padding(top = 4.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
+    ) {
+        RouteInfo(
+            cityFrom = route.cityFrom,
+            cityTo = route.cityTo,
+            departure = route.utc_departure.split("T")[1].dropLast(5),
+            arrival = route.utc_arrival.split("T")[1].dropLast(5)
         )
     }
 }
