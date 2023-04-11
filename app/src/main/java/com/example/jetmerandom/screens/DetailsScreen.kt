@@ -73,7 +73,6 @@ fun DetailsScreen(viewModel: SearchViewModel){
                 Marker(
                     state = MarkerState(position = r.value),
                     title = r.key,
-                    snippet = r.key + " snipped"
                 )
             }
             println(routesList)
@@ -125,7 +124,7 @@ fun DetailsCard(viewModel: SearchViewModel){
                     text2 = state.qChilds.toString() + " x " + flight.fare.children.toString()
                 )
                 Row(
-                    Modifier.fillMaxWidth(),
+                    Modifier.fillMaxWidth().padding(end = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(text = flight.price.toString() + " " + flight.currency.toString())

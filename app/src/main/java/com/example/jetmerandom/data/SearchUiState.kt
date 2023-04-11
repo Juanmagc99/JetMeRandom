@@ -10,7 +10,7 @@ data class SearchUiState(
 
     val maxPrice: Float = 500.0f,
 
-    val maxTime: Int = 20,
+    val minTime: Int = 2,
 
     val qAdults: Int = 1,
 
@@ -18,7 +18,7 @@ data class SearchUiState(
 
     val startDate: LocalDate = LocalDate.now(),
 
-    val endDate: LocalDate = LocalDate.now(),
+    val endDate: LocalDate = LocalDate.now().plusDays(20),
 
     val isDirect: Boolean = true,
 

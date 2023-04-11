@@ -17,12 +17,20 @@ interface APIService {
         @Query("fly_from") fly_from:String,
         @Query("date_from") date_from:String,
         @Query("date_to") date_to:String,
-        @Query("rerturn_from") return_from:String,
-        @Query("rerturn_to") return_to:String,
+        @Query("return_to") return_to:String,
+        @Query("return_from") return_from:String,
         @Query("limit") limit:Int,
         @Query("nights_in_dst_from") nights_in_dst_from:Int,
         @Query("nights_in_dst_to") nights_in_dst_to:Int,
         @Query("flight_type") flight_type:String,
+        @Query("ret_from_diff_airport") ret_from_diff_airport:Int = 0,
+        @Query("ret_to_diff_airport") ret_to_diff_airport:Int = 0,
+        @Query("price_from") price_from:Int,
+        @Query("price_to") price_to:Int,
+        @Query("max_stopovers") max_stopovers:Int,
+        @Query("adults") adults:Int,
+        @Query("children") children:Int,
+
         @Header("apikey") apiKey: String,
     ): Response<FlightsResponse>
 

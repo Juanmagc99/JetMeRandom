@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
             val row : List<String> = it.split(";")
             val city = row[10]
             val code = row[13]
-            if(row[7] == "EU" && code != "" && city != "" && row[8] == "ES"){
+            if(row[7] == "EU" && code != "" && city != "" && row[8] == "GB"){
                 cities.add("$code - $city")
             }
         }

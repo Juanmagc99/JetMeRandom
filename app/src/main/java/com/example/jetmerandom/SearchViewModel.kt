@@ -41,12 +41,12 @@ class SearchViewModel: ViewModel() {
         CoroutineScope(Dispatchers.IO).launch {
             val call = getRetrofit().create(APIService::class.java)
             for (r in flight!!.routes){
-                val location_departure_call = call.getCitiesLocation(r.cityCodeFrom + " " + r.cityFrom)
+                val location_departure_call = call.getCitiesLocation(r.cityFrom.replace(","," "))
                 println(location_departure_call)
-                val location_arrival_call = call.getCitiesLocation(r.cityCodeTo + " " + r.cityTo)
+                val location_arrival_call = call.getCitiesLocation(r.cityTo.replace(","," "))
                 println(location_arrival_call)
                 if (location_departure_call.isSuccessful && location_arrival_call.isSuccessful){
-                    print("Funciona")
+                    print("LLamada exitosa a position")
                     val locationDeparture = location_departure_call.body()?.data?.get(0)
                     val locationArrival = location_arrival_call.body()?.data?.get(0)
                     if (locationDeparture != null && locationArrival != null) {
@@ -69,18 +69,24 @@ class SearchViewModel: ViewModel() {
         CoroutineScope(Dispatchers.IO).launch{
             val call = getRetrofit().create(APIService::class.java).getFlights(
                 apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
-                fly_from = "MAD",
-                date_from = "15/05/2023",
-                date_to = "25/05/2023",
-                return_from = "28/05/2023",
-                return_to = "10/06/2023",
+                fly_from = uiState.value.origin.split("-")[0].dropLast(1),
+                date_from = formatDate(uiState.value.startDate.toString()),
+                date_to = formatDate(uiState.value.startDate.plusDays(uiState.value.minTime.toLong()).toString()),
+                return_from = formatDate(uiState.value.startDate.plusDays(uiState.value.minTime.toLong()).toString()),
+                return_to = formatDate(uiState.value.endDate.toString()),
                 flight_type = "round",
-                nights_in_dst_from = 2,
-                nights_in_dst_to = 20,
+                nights_in_dst_from = uiState.value.minTime,
+                nights_in_dst_to = uiState.value.minTime,
+                price_from = uiState.value.minPrice.toInt(),
+                price_to = uiState.value.maxPrice.toInt(),
+                max_stopovers = if (uiState.value.isDirect) 0 else {2},
+                adults = uiState.value.qAdults,
+                children = uiState.value.qChilds,
                 limit = 15,
             )
             if (call.isSuccessful){
-                println("LLamada exitosa")
+                println("LLamada exitosa a tequila")
+                println(call)
                 val flights_to_add = call.body()?.data
                 val flights_filtered = flights_to_add
                     ?.stream()
@@ -128,15 +134,21 @@ class SearchViewModel: ViewModel() {
         val start = uiState.value.startDate
         val end = uiState.value.endDate
 
-        if (start.isBefore(end) || start.isEqual(end)) {
-            _uiState.value = currentState.copy(checkDates = true)
-        } else {
+
+        if (end.minusDays(uiState.value.minTime.toLong()) <= start){
             _uiState.value = currentState.copy(checkDates = false)
+        }else {
+            _uiState.value = currentState.copy(checkDates = true)
         }
     }
 
     fun checkAndSearch(context: Context){
 
+    }
+
+    fun formatDate(date: String): String {
+        val dateSplit = date.split("-")
+        return dateSplit[2] + "/" + dateSplit[1] + "/" + dateSplit[0]
     }
 
     fun checkPassengers(){
@@ -167,7 +179,7 @@ class SearchViewModel: ViewModel() {
 
     fun checkTime(){
         val currentState = _uiState.value
-        val maxTime = uiState.value.maxTime
+        val maxTime = uiState.value.minTime
 
         if(maxTime <= 0){
             _uiState.value = currentState.copy(checkHours = false)
@@ -192,19 +204,17 @@ class SearchViewModel: ViewModel() {
         checkDates()
     }
 
-    fun setMaxHours(maxTime: Int){
+    fun setMinNights(maxTime: Int){
         val currentState = _uiState.value
-        _uiState.value = currentState.copy(maxTime = maxTime)
+        _uiState.value = currentState.copy(minTime = maxTime)
 
+        checkDates()
         checkTime()
     }
 
-    fun setPriceRange(priceRange: ClosedFloatingPointRange<Float>){
+    fun setPriceRange(start:Float, end:Float){
         val currentState = _uiState.value
-        val minPrice = priceRange.start
-        val maxPrice = priceRange.endInclusive
-        _uiState.value = currentState.copy(minPrice = minPrice)
-        _uiState.value = currentState.copy(maxPrice = maxPrice)
+        _uiState.value = currentState.copy(minPrice = start, maxPrice = end)
     }
 
     fun setOrigin(origin: String) {
