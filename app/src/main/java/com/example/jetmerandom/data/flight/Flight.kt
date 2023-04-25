@@ -1,4 +1,4 @@
-package com.example.jetmerandom.data
+package com.example.jetmerandom.data.flight
 
 data class Flight(
     val city_from: String,

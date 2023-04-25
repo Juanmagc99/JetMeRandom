@@ -1,6 +1,5 @@
 package com.example.jetmerandom
 
-import android.telecom.Call.Details
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -15,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,15 +22,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.DataSource.flights
-import com.example.jetmerandom.data.Flight
+import com.example.jetmerandom.data.DataSource.flightsListed
+import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.screens.components.CardRoute
 
 @Composable
@@ -40,19 +37,30 @@ fun ListinScreen(
     viewModel: SearchViewModel,
     onDetailsClicked: () -> Unit = {}
 ){
-    println(flights)
     LazyColumn(modifier = Modifier.background(MaterialTheme.colors.background)) {
-        items(flights){
-            FlightItem(flight = it,
-                onDetailsClicked = onDetailsClicked,
-                viewModel = viewModel
-            )
+        for (flights in flightsListed){
+            item {
+                Text(
+                    text = flights.key,
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier.padding(8.dp)
+                )
+            }
+            items(flights.value){
+                FlightItem(flight = it,
+                    onDetailsClicked = onDetailsClicked,
+                    viewModel = viewModel
+                )
+            }
         }
+
+
     }
+
 }
 
 @Composable
-fun FlightItem(flight: Flight,onDetailsClicked: () -> Unit = {}, viewModel: SearchViewModel){
+fun FlightItem(flight: Flight, onDetailsClicked: () -> Unit = {}, viewModel: SearchViewModel){
     var expanded by remember { mutableStateOf(false) }
 
     val color by animateColorAsState(
@@ -82,10 +90,11 @@ fun FlightItem(flight: Flight,onDetailsClicked: () -> Unit = {}, viewModel: Sear
                     .padding(8.dp)
             ) {
                 CityIcon(flight.imageURL)
-                CardInfo(flight.city_to,
+                CardInfo(
                     flight.price,
                     flight.currency,
-                    "$departure $arrival"
+                    departure,
+                    arrival
                 )
                 Spacer(Modifier.weight(1f))
                 ExpandedButton(
@@ -123,21 +132,27 @@ fun ExpandedButton(expanded: Boolean, onClick: ()-> Unit){
 }
 
 @Composable
-fun CardInfo(cityTo:String,
-             price:Int,
+fun CardInfo(price:Int,
              currency:String,
-             date:String
+             dateFrom:String,
+             dateTo:String
 ){
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 8.dp)
-        ) {
+        ){
+        Column(modifier = Modifier.width(150.dp)) {
             Text(
-                text = cityTo,
-                style = MaterialTheme.typography.h5,
-                modifier = Modifier.width(150.dp)
+                text = dateFrom,
+                style = MaterialTheme.typography.subtitle2,
             )
+            Text(
+                text = dateTo,
+                style = MaterialTheme.typography.subtitle2,
+            )
+        }
+
             Spacer(modifier = Modifier.padding(start = 65.dp))
             Text(
                 text = "$price $currency",
@@ -145,12 +160,6 @@ fun CardInfo(cityTo:String,
             )
 
         }
-
-        Text(
-            text = date,
-            style = MaterialTheme.typography.body2,
-            fontSize = 14.sp
-        )
     }
 }
 

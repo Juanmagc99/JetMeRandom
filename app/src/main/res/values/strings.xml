@@ -3,12 +3,15 @@
     <string name="back_button">Back</string>
     <string name="hours_label">Min nights</string>
     <string name="direct_flight">Direct flight</string>
-    <string name="indirect_flight">Indirect flight</string>
+    <string name="indirect_flight">Connecting Flight</string>
     <string name="date_error_message">The min days are more that the time span</string>
     <string name="origin_error_message">Cant found this airport</string>
     <string name="expand_card">Expand flight card</string>
     <string name="prices">Prices</string>
     <string name="duration">Duration</string>
     <string name="select_dates">Dates</string>
+    <string name="searching_flights">We are searching your flights</string>
+    <string name="not_found">No flights found</string>
+    <string name="wrong_message">Something went wrong</string>
 
 </resources>

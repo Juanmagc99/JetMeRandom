@@ -13,8 +13,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.jetmerandom.data.Flight
-import com.example.jetmerandom.data.Route
+import com.example.jetmerandom.data.flight.Flight
+import com.example.jetmerandom.data.flight.Route
 
 @Composable
 fun CardRoute(flight: Flight){

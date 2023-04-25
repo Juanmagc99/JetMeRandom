@@ -1,12 +1,15 @@
 package com.example.jetmerandom
 
 import android.content.Context
+import android.widget.Toast
+import androidx.annotation.UiThread
 import androidx.lifecycle.ViewModel
 import com.example.jetmerandom.API.APIService
 import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.DataSource.flights
+import com.example.jetmerandom.data.DataSource.flightsListed
 import com.example.jetmerandom.data.DataSource.routesLocation
-import com.example.jetmerandom.data.Flight
+import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.data.SearchUiState
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
@@ -16,10 +19,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Dispatcher
+import okhttp3.internal.filterList
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
 import java.util.function.Predicate
+import java.util.stream.Collectors
 import kotlin.streams.toList
 
 class SearchViewModel: ViewModel() {
@@ -64,14 +70,15 @@ class SearchViewModel: ViewModel() {
         }
     }
 
-    fun getFlights(onNextButtonClicked: () -> Unit = {}) {
+    fun getFlights(onNextButtonClicked: () -> Unit = {}, mContext: Context) {
         flights.clear()
+        makeAToast(R.string.searching_flights,mContext)
         CoroutineScope(Dispatchers.IO).launch{
             val call = getRetrofit().create(APIService::class.java).getFlights(
                 apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
                 fly_from = uiState.value.origin.split("-")[0].dropLast(1),
                 date_from = formatDate(uiState.value.startDate.toString()),
-                date_to = formatDate(uiState.value.startDate.plusDays(uiState.value.minTime.toLong()).toString()),
+                date_to = formatDate(uiState.value.endDate.minusDays(uiState.value.minTime.toLong()).toString()),
                 return_from = formatDate(uiState.value.startDate.plusDays(uiState.value.minTime.toLong()).toString()),
                 return_to = formatDate(uiState.value.endDate.toString()),
                 flight_type = "round",
@@ -82,10 +89,9 @@ class SearchViewModel: ViewModel() {
                 max_stopovers = if (uiState.value.isDirect) 0 else {2},
                 adults = uiState.value.qAdults,
                 children = uiState.value.qChilds,
-                limit = 15,
+                limit = 50,
             )
             if (call.isSuccessful){
-                println("LLamada exitosa a tequila")
                 println(call)
                 val flights_to_add = call.body()?.data
                 val flights_filtered = flights_to_add
@@ -95,6 +101,7 @@ class SearchViewModel: ViewModel() {
 
                 if (flights_filtered != null) {
                     if(flights_filtered.isNotEmpty()){
+                        var setDestinations = mutableSetOf<String>()
                         val currency = call.body()!!.currency
                         for (f in flights_filtered) {
                             val call_image = getRetrofit().create(APIService::class.java)
@@ -114,19 +121,40 @@ class SearchViewModel: ViewModel() {
                                 imageURL = imageURL,
                                 currency = currency
                             )
+                            setDestinations.add(f.cityTo)
                             flights.add(flight)
+                            procesingFlights(flights = flights, destinations = setDestinations)
                         }
                         withContext(Dispatchers.Main){
                             onNextButtonClicked()
                         }
                     }
+                } else {
+                    withContext(Dispatchers.Main){
+                        makeAToast(R.string.not_found,mContext)
+                    }
                 }
-
             } else {
                 println(call)
-                println("Llamada erronea")
+                withContext(Dispatchers.Main){
+                    makeAToast(R.string.wrong_message,mContext)
+                }
             }
         }
+    }
+
+    fun procesingFlights(flights: List<Flight>, destinations: Set<String>){
+        flightsListed.clear()
+        for (d in destinations){
+            flightsListed[d] = flights
+                .stream()
+                .filter { f -> f.city_to == d }
+                .collect(Collectors.toList())
+        }
+    }
+
+    fun makeAToast(idString:Int, mContext: Context){
+        Toast.makeText(mContext,idString, Toast.LENGTH_LONG).show()
     }
 
     fun checkDates(){

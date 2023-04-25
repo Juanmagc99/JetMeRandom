@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import com.example.jetmerandom.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
@@ -43,6 +44,8 @@ fun SearchScreen(
     viewModel: SearchViewModel,
     onNextButtonClicked: () -> Unit = {},
 ){
+
+    val mContext = LocalContext.current
 
     val state = viewModel.uiState.collectAsState().value
 
@@ -173,7 +176,8 @@ fun SearchScreen(
 
         Button(
             onClick = {
-                viewModel.getFlights(onNextButtonClicked)
+                //viewModel.makeAToast(R.string.searching_flights,mContext)
+                viewModel.getFlights(onNextButtonClicked, mContext = mContext)
                 println(state)
             },
         ) {

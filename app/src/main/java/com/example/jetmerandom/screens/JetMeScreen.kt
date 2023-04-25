@@ -1,4 +1,4 @@
-package com.example.jetmerandom
+package com.example.jetmerandom.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -13,6 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.jetmerandom.ListinScreen
+import com.example.jetmerandom.SearchViewModel
 import com.example.jetmerandom.screens.DetailsScreen
 import com.example.jetmerandom.screens.SearchScreen
 import java.time.LocalDate
@@ -32,14 +34,14 @@ fun JetMeRandomAppBar(
     currentScreen: String,
 ) {
     TopAppBar(
-        title = { Text(stringResource(id = R.string.app_name)) },
+        title = { Text(stringResource(com.example.jetmerandom.R.string.app_name)) },
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back_button)
+                        contentDescription = stringResource(com.example.jetmerandom.R.string.back_button)
                     )
                 }
             }
@@ -93,6 +95,5 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
                 )
             }
         }
-
     }
 }

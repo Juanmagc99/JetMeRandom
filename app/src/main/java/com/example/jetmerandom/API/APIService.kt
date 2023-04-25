@@ -1,7 +1,7 @@
 package com.example.jetmerandom.API
 
 
-import com.example.jetmerandom.data.FlightsResponse
+import com.example.jetmerandom.data.flight.FlightsResponse
 import com.example.jetmerandom.data.image.ImageResponse
 import com.example.jetmerandom.data.position.LocationResponse
 import retrofit2.Response

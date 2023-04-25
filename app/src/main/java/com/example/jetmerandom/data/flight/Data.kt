@@ -1,4 +1,4 @@
-package com.example.jetmerandom.data
+package com.example.jetmerandom.data.flight
 
 data class Data(
     val airlines: List<String>,

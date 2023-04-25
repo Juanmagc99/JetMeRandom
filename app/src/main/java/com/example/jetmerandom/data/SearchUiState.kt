@@ -1,5 +1,6 @@
 package com.example.jetmerandom.data
 
+import com.example.jetmerandom.data.flight.Flight
 import java.time.LocalDate
 
 data class SearchUiState(
