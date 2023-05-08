@@ -6,6 +6,7 @@ data class Data(
     val baglimit: Baglimit,
     val bags_price: BagsPrice,
     val booking_token: String,
+    val deep_link: String,
     val cityCodeFrom: String,
     val cityCodeTo: String,
     val cityFrom: String,

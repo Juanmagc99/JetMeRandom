@@ -2,7 +2,6 @@ package com.example.jetmerandom
 
 import android.content.Context
 import android.widget.Toast
-import androidx.annotation.UiThread
 import androidx.lifecycle.ViewModel
 import com.example.jetmerandom.API.APIService
 import com.example.jetmerandom.data.DataSource
@@ -19,11 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
-import okhttp3.internal.filterList
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.Period
 import java.util.function.Predicate
 import java.util.stream.Collectors
 import kotlin.streams.toList
@@ -73,6 +72,7 @@ class SearchViewModel: ViewModel() {
     fun getFlights(onNextButtonClicked: () -> Unit = {}, mContext: Context) {
         flights.clear()
         makeAToast(R.string.searching_flights,mContext)
+        println(uiState.value.maxHours)
         CoroutineScope(Dispatchers.IO).launch{
             val call = getRetrofit().create(APIService::class.java).getFlights(
                 apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
@@ -83,13 +83,19 @@ class SearchViewModel: ViewModel() {
                 return_to = formatDate(uiState.value.endDate.toString()),
                 flight_type = "round",
                 nights_in_dst_from = uiState.value.minTime,
-                nights_in_dst_to = uiState.value.minTime,
+                nights_in_dst_to = Period.between(uiState.value.startDate,uiState.value.endDate).days,
                 price_from = uiState.value.minPrice.toInt(),
                 price_to = uiState.value.maxPrice.toInt(),
                 max_stopovers = if (uiState.value.isDirect) 0 else {2},
                 adults = uiState.value.qAdults,
                 children = uiState.value.qChilds,
-                limit = 50,
+                dtime_to = uiState.value.depTime.toString(),
+                atime_to = uiState.value.arrTime.toString(),
+                ret_dtime_to = uiState.value.rdepTime.toString(),
+                ret_atime_to = uiState.value.rarrTime.toString(),
+                selected_cabins = uiState.value.cabinType,
+                max_fly_duration = uiState.value.maxHours,
+                limit = 100,
             )
             if (call.isSuccessful){
                 println(call)
@@ -119,7 +125,8 @@ class SearchViewModel: ViewModel() {
                                 routes = f.route,
                                 price = f.price,
                                 imageURL = imageURL,
-                                currency = currency
+                                currency = currency,
+                                deep_link = f.deep_link
                             )
                             setDestinations.add(f.cityTo)
                             flights.add(flight)
@@ -170,9 +177,6 @@ class SearchViewModel: ViewModel() {
         }
     }
 
-    fun checkAndSearch(context: Context){
-
-    }
 
     fun formatDate(date: String): String {
         val dateSplit = date.split("-")
@@ -205,16 +209,6 @@ class SearchViewModel: ViewModel() {
         }
     }
 
-    fun checkTime(){
-        val currentState = _uiState.value
-        val maxTime = uiState.value.minTime
-
-        if(maxTime <= 0){
-            _uiState.value = currentState.copy(checkHours = false)
-        } else {
-            _uiState.value = currentState.copy(checkHours = true)
-        }
-    }
 
     fun setFligthDetails(flight: Flight){
         val currentState = _uiState.value
@@ -232,12 +226,31 @@ class SearchViewModel: ViewModel() {
         checkDates()
     }
 
-    fun setMinNights(maxTime: Int){
+    fun setCabins(cabinType: String){
         val currentState = _uiState.value
-        _uiState.value = currentState.copy(minTime = maxTime)
+        _uiState.value = currentState.copy(cabinType = cabinType)
+    }
+
+    fun setMinNights(minTime: Int){
+        val currentState = _uiState.value
+        if (minTime >= 0){
+            _uiState.value = currentState.copy(minTime = minTime, checkDays = true)
+        } else {
+            _uiState.value = currentState.copy(checkDays = false)
+        }
+
 
         checkDates()
-        checkTime()
+    }
+
+    fun setMaxHours(maxHours: Int){
+        val currentState = _uiState.value
+        if (maxHours >= 0){
+            _uiState.value = currentState.copy(maxHours = maxHours,checkHours = true)
+        } else {
+            _uiState.value = currentState.copy(checkHours = false)
+        }
+
     }
 
     fun setPriceRange(start:Float, end:Float){
@@ -266,6 +279,26 @@ class SearchViewModel: ViewModel() {
         }
 
         checkPassengers()
+    }
+
+    fun setDepTime(depTime: LocalTime){
+        val currentState = _uiState.value
+        _uiState.value = currentState.copy(depTime = depTime)
+    }
+
+    fun setArrTime(arrTime: LocalTime){
+        val currentState = _uiState.value
+        _uiState.value = currentState.copy(arrTime = arrTime)
+    }
+
+    fun setrDepTime(depTime: LocalTime){
+        val currentState = _uiState.value
+        _uiState.value = currentState.copy(rdepTime = depTime)
+    }
+
+    fun setrArrTime(arrTime: LocalTime){
+        val currentState = _uiState.value
+        _uiState.value = currentState.copy(rarrTime = arrTime)
     }
 
 

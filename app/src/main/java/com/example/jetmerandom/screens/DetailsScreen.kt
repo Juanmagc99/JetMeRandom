@@ -1,27 +1,33 @@
 package com.example.jetmerandom.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.jetmerandom.R
 
 import com.example.jetmerandom.SearchViewModel
-import com.example.jetmerandom.data.DataSource.flights
 import com.example.jetmerandom.data.DataSource.routesLocation
-import com.example.jetmerandom.screens.components.CardRouteUniversal
+import com.example.jetmerandom.screens.components.RouteCard
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.compose.*
 import java.time.Duration
 
@@ -37,6 +43,7 @@ fun DetailsScreen(viewModel: SearchViewModel){
         position = CameraPosition.fromLatLngZoom(from, 10f)
     }
 
+    val scrollState = rememberScrollState()
 
     val routesList = routesLocation.values.toList()
     Column(
@@ -44,22 +51,40 @@ fun DetailsScreen(viewModel: SearchViewModel){
         modifier = Modifier
             .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp)
             .fillMaxWidth()
+            .verticalScroll(
+                state = scrollState,
+            )
     ) {
-        Text(
-            text = state.flight.city_from + " / " + state.flight.city_to,
-            style = MaterialTheme.typography.h5,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
-        )
-        Text(
-            text = state.flight.routes[0].utc_departure.split("T")[0] + " / " +
-                    state.flight.routes.last().utc_departure.split("T")[0],
-            style = MaterialTheme.typography.h6,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally)
-        )
+        Row() {
+            Image(
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(35)),
+                contentScale = ContentScale.Crop,
+                painter = rememberAsyncImagePainter(model = state.flight.imageURL),
+                contentDescription = null
+            )
+            Column() {
+                Text(
+                    text = state.flight.city_from + " / " + state.flight.city_to,
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally),
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = state.flight.routes[0].utc_departure.split("T")[0] + " / " +
+                            state.flight.routes.last().utc_departure.split("T")[0],
+                    style = MaterialTheme.typography.h6,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+        }
+
 
         DetailsCard(viewModel = viewModel)
        GoogleMap(
@@ -75,7 +100,7 @@ fun DetailsScreen(viewModel: SearchViewModel){
                     title = r.key,
                 )
             }
-            println(routesList)
+
             Polyline(
                 points = routesList,
                 geodesic = true
@@ -93,9 +118,10 @@ fun DetailsCard(viewModel: SearchViewModel){
         elevation = 4.dp,
         modifier = Modifier.padding(bottom = 8.dp)
     ){
-        Column (modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
+        Column (
+            modifier = Modifier.padding(8.dp)
+            .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ){
 
             if (flight != null) {
@@ -104,11 +130,12 @@ fun DetailsCard(viewModel: SearchViewModel){
                     fontWeight = FontWeight.Bold
                 )
                 CardInfoRow(
-                    text1 = "Time to go: ",
+                    text1 = "Time to arrive: ",
                     text2 = Duration.ofSeconds(flight.duration.departure.toLong()).toString()
                 )
+
                 CardInfoRow(
-                    text1 = "Time to come: ",
+                    text1 = "Time to return: ",
                     text2 = Duration.ofSeconds(flight.duration.`return`.toLong()).toString()
                 )
                 Text(
@@ -124,14 +151,23 @@ fun DetailsCard(viewModel: SearchViewModel){
                     text2 = state.qChilds.toString() + " x " + flight.fare.children.toString()
                 )
                 Row(
-                    Modifier.fillMaxWidth().padding(end = 8.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(end = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(text = flight.price.toString() + " " + flight.currency.toString())
                 }
-                println(flight.routes)
+
+                Divider(
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp)
+                        .padding(8.dp)
+                )
                 for (r in flight.routes!!){
-                    CardRouteUniversal(route = r)
+                    RouteCard(route = r)
                 }
             }
 
@@ -143,8 +179,7 @@ fun DetailsCard(viewModel: SearchViewModel){
 fun CardInfoRow(text1:String, text2:String){
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = text1)

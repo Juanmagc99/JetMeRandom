@@ -21,7 +21,7 @@ interface APIService {
         @Query("return_from") return_from:String,
         @Query("limit") limit:Int,
         @Query("nights_in_dst_from") nights_in_dst_from:Int,
-        @Query("nights_in_dst_to") nights_in_dst_to:Int,
+        @Query("nights_in_dst_to") nights_in_dst_to: Int,
         @Query("flight_type") flight_type:String,
         @Query("ret_from_diff_airport") ret_from_diff_airport:Int = 0,
         @Query("ret_to_diff_airport") ret_to_diff_airport:Int = 0,
@@ -30,7 +30,12 @@ interface APIService {
         @Query("max_stopovers") max_stopovers:Int,
         @Query("adults") adults:Int,
         @Query("children") children:Int,
-
+        @Query("selected_cabins") selected_cabins:String,
+        @Query("dtime_to") dtime_to:String,
+        @Query("atime_to") atime_to:String,
+        @Query("ret_dtime_to") ret_dtime_to:String,
+        @Query("ret_atime_to") ret_atime_to:String,
+        @Query("max_fly_duration") max_fly_duration:Int,
         @Header("apikey") apiKey: String,
     ): Response<FlightsResponse>
 

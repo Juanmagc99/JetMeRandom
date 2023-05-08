@@ -2,10 +2,13 @@ package com.example.jetmerandom.data
 
 import com.example.jetmerandom.data.flight.Flight
 import java.time.LocalDate
+import java.time.LocalTime
 
 data class SearchUiState(
 
     val origin: String = "",
+
+    val dest: String = "",
 
     val minPrice: Float = 10.0f,
 
@@ -23,6 +26,28 @@ data class SearchUiState(
 
     val isDirect: Boolean = true,
 
+    val maxHours: Int = 10,
+
+    val depTime: LocalTime = LocalTime.of(23,59),
+
+    val arrTime: LocalTime = LocalTime.of(23,59),
+
+    val rdepTime: LocalTime = LocalTime.of(23,59),
+
+    val rarrTime: LocalTime = LocalTime.of(23,59),
+
+
+    /*
+    *
+    *
+    *
+    *
+    *
+    *
+    * */
+
+    val cabinType: String = "M",
+
     val checkDates: Boolean = true,
 
     val checkCityExists: Boolean = true,
@@ -32,6 +57,8 @@ data class SearchUiState(
     val checkPassengers: Boolean = true,
 
     val checkHours: Boolean = true,
+
+    val checkDays: Boolean = true,
 
     val flight: Flight? = null
 

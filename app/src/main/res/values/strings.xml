@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">JetMeRandom</string>
     <string name="back_button">Back</string>
-    <string name="hours_label">Min nights</string>
+    <string name="hours_label">Max hours</string>
+    <string name="nights_label">Min nights</string>
     <string name="direct_flight">Direct flight</string>
     <string name="indirect_flight">Connecting Flight</string>
     <string name="date_error_message">The min days are more that the time span</string>

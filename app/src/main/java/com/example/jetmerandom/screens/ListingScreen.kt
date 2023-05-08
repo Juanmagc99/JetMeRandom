@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +32,7 @@ import com.example.jetmerandom.data.DataSource.flights
 import com.example.jetmerandom.data.DataSource.flightsListed
 import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.screens.components.CardRoute
+import java.time.Duration
 
 @Composable
 fun ListinScreen(
@@ -39,22 +41,27 @@ fun ListinScreen(
 ){
     LazyColumn(modifier = Modifier.background(MaterialTheme.colors.background)) {
         for (flights in flightsListed){
+            var flightsToDisplay: List<Flight>
             item {
                 Text(
                     text = flights.key,
                     style = MaterialTheme.typography.h5,
-                    modifier = Modifier.padding(8.dp)
+                    modifier = Modifier.padding(8.dp),
+                    fontWeight = FontWeight.Black
                 )
             }
-            items(flights.value){
+            if (flights.value.size >= 5){
+                flightsToDisplay = flights.value.subList(0,4)
+            } else {
+                flightsToDisplay = flights.value
+            }
+            items(flightsToDisplay){
                 FlightItem(flight = it,
                     onDetailsClicked = onDetailsClicked,
                     viewModel = viewModel
                 )
             }
         }
-
-
     }
 
 }
@@ -87,14 +94,16 @@ fun FlightItem(flight: Flight, onDetailsClicked: () -> Unit = {}, viewModel: Sea
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 CityIcon(flight.imageURL)
                 CardInfo(
                     flight.price,
                     flight.currency,
                     departure,
-                    arrival
+                    arrival,
+                    flight.duration
                 )
                 Spacer(Modifier.weight(1f))
                 ExpandedButton(
@@ -120,6 +129,7 @@ fun FlightItem(flight: Flight, onDetailsClicked: () -> Unit = {}, viewModel: Sea
 }
 
 
+
 @Composable
 fun ExpandedButton(expanded: Boolean, onClick: ()-> Unit){
     IconButton(onClick = onClick) {
@@ -135,31 +145,57 @@ fun ExpandedButton(expanded: Boolean, onClick: ()-> Unit){
 fun CardInfo(price:Int,
              currency:String,
              dateFrom:String,
-             dateTo:String
+             dateTo:String,
+             duration: com.example.jetmerandom.data.flight.Duration
 ){
-    Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(top = 8.dp)
-        ){
-        Column(modifier = Modifier.width(150.dp)) {
-            Text(
-                text = dateFrom,
-                style = MaterialTheme.typography.subtitle2,
-            )
-            Text(
-                text = dateTo,
-                style = MaterialTheme.typography.subtitle2,
-            )
-        }
 
-            Spacer(modifier = Modifier.padding(start = 65.dp))
-            Text(
-                text = "$price $currency",
-                style = MaterialTheme.typography.subtitle2
-            )
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ){
 
-        }
+        CarColumn(text1 = dateFrom, text2 = dateTo)
+        Divider(
+            color = Color.Gray,
+            modifier = Modifier
+                .height(50.dp)
+                .width(1.dp)
+        )
+        CarColumn(
+            text1 = Duration.ofSeconds(duration.departure.toLong()).toString(),
+            text2 = Duration.ofSeconds(duration.`return`.toLong()).toString()
+        )
+        Divider(
+            color = Color.Gray,
+            modifier = Modifier
+                .height(50.dp)
+                .width(1.dp)
+        )
+        Text(
+            text = "$price $currency",
+            style = MaterialTheme.typography.h6,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+
+}
+
+@Composable
+fun CarColumn(text1: String, text2: String){
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.width(80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = text1,
+            style = MaterialTheme.typography.subtitle2,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Text(
+            text = text2,
+            style = MaterialTheme.typography.subtitle2,
+        )
     }
 }
 

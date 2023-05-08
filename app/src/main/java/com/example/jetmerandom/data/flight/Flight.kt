@@ -8,5 +8,6 @@ data class Flight(
     val price: Int,
     val duration: Duration,
     val imageURL: String,
-    val currency: String
+    val currency: String,
+    val deep_link: String,
 )
