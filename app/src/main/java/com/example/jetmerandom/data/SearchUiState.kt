@@ -1,6 +1,6 @@
 package com.example.jetmerandom.data
 
-import com.example.jetmerandom.data.flight.Flight
+import com.example.jetmerandom.data.domain.Flight
 import java.time.LocalDate
 import java.time.LocalTime
 

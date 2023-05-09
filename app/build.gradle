@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp' version '1.8.0-1.0.8'
 }
 
 android {
@@ -37,7 +38,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.2.0'
+        kotlinCompilerExtensionVersion '1.4.1'
     }
     packagingOptions {
         resources {
@@ -79,6 +80,11 @@ dependencies {
     implementation 'com.maxkeppeler.sheets-compose-dialogs:list:1.0.2'
 
     implementation 'com.google.maps.android:maps-compose:2.11.2'
+
+
+    implementation "androidx.room:room-runtime:2.5.0"
+    ksp "androidx.room:room-compiler:2.5.0"
+    implementation "androidx.room:room-ktx:2.5.0"
 
     // Make sure to also include the latest version of the Maps SDK for Android
     implementation 'com.google.android.gms:play-services-maps:18.0.2'

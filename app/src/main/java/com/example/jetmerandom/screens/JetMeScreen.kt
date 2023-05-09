@@ -15,9 +15,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetmerandom.ListinScreen
 import com.example.jetmerandom.SearchViewModel
-import com.example.jetmerandom.screens.DetailsScreen
-import com.example.jetmerandom.screens.SearchScreen
-import java.time.LocalDate
 
 
 enum class JetMeScreen() {
@@ -51,7 +48,9 @@ fun JetMeRandomAppBar(
 
 
 @Composable
-fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel()){
+fun JetMeRandomApp(modifier: Modifier = Modifier,
+                   searchViewModel : SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+){
 
     val navController = rememberNavController()
 
@@ -68,7 +67,7 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
             )
         }
     ) { innerPadding ->
-        val uiState by viewModel.uiState.collectAsState()
+        val uiState by searchViewModel.uiState.collectAsState()
 
         NavHost(
             navController = navController,
@@ -77,13 +76,13 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
         ) {
             composable(route = JetMeScreen.Search.name) {
                 SearchScreen (
-                    viewModel = viewModel,
+                    viewModel = searchViewModel,
                     onNextButtonClicked = {navController.navigate(JetMeScreen.Listing.name)}
                 )
             }
             composable(route = JetMeScreen.Listing.name) {
                 ListinScreen(
-                    viewModel = viewModel,
+                    viewModel = searchViewModel,
                     onDetailsClicked = {
                         navController.navigate(JetMeScreen.Details.name)
                     }
@@ -91,7 +90,7 @@ fun JetMeRandomApp(modifier: Modifier = Modifier, viewModel: SearchViewModel = a
             }
             composable(route = JetMeScreen.Details.name) {
                 DetailsScreen(
-                    viewModel = viewModel
+                    searchViewModel = searchViewModel,
                 )
             }
         }

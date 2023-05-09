@@ -8,7 +8,7 @@ import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.DataSource.flights
 import com.example.jetmerandom.data.DataSource.flightsListed
 import com.example.jetmerandom.data.DataSource.routesLocation
-import com.example.jetmerandom.data.flight.Flight
+import com.example.jetmerandom.data.domain.Flight
 import com.example.jetmerandom.data.SearchUiState
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
