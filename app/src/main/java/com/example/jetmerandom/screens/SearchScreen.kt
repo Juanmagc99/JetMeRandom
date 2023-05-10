@@ -354,13 +354,6 @@ fun EditNumberField(
 
 }
 
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun PreviewSearch(){
-    SearchScreen(
-        viewModel = SearchViewModel()
-        )
-}
 
 
 

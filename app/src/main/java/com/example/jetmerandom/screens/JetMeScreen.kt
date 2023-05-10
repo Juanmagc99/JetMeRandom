@@ -48,8 +48,8 @@ fun JetMeRandomAppBar(
 
 
 @Composable
-fun JetMeRandomApp(modifier: Modifier = Modifier,
-                   searchViewModel : SearchViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+fun JetMeRandomApp(
+                   searchViewModel : SearchViewModel,
 ){
 
     val navController = rememberNavController()
@@ -72,7 +72,7 @@ fun JetMeRandomApp(modifier: Modifier = Modifier,
         NavHost(
             navController = navController,
             startDestination = JetMeScreen.Search.name,
-            modifier = modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = JetMeScreen.Search.name) {
                 SearchScreen (

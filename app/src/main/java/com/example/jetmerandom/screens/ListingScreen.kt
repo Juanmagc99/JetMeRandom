@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.jetmerandom.data.DataSource.flightsListed
-import com.example.jetmerandom.data.domain.Flight
+import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.screens.components.CardRoute
 import java.time.Duration
 
@@ -206,13 +206,5 @@ fun CityIcon(cityImage:String) {
         contentScale = ContentScale.Crop,
         painter = rememberAsyncImagePainter(model = cityImage),
         contentDescription = null
-    )
-}
-
-@Preview(showSystemUi = true, showBackground = true)
-@Composable
-fun ListingPreview(){
-    ListinScreen(
-        viewModel = SearchViewModel()
     )
 }

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.example.jetmerandom.data.domain.Flight
+import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.data.flight.Route
 
 @Composable
