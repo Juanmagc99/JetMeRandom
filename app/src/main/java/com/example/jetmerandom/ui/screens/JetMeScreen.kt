@@ -1,4 +1,4 @@
-package com.example.jetmerandom.screens
+package com.example.jetmerandom.ui.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -14,13 +14,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetmerandom.ListinScreen
-import com.example.jetmerandom.SearchViewModel
+import com.example.jetmerandom.screens.DetailsScreen
+import com.example.jetmerandom.screens.SearchScreen
+import com.example.jetmerandom.ui.LikedFlightViewModel
+import com.example.jetmerandom.ui.SearchViewModel
 
 
 enum class JetMeScreen() {
     Search,
     Listing,
-    Details
+    Details,
+    Liked
 }
 
 @Composable
@@ -48,8 +52,9 @@ fun JetMeRandomAppBar(
 
 
 @Composable
-fun JetMeRandomApp(
-                   searchViewModel : SearchViewModel,
+fun JetMeRandomAppTotal(
+    searchViewModel : SearchViewModel,
+    likedFlightViewModel: LikedFlightViewModel
 ){
 
     val navController = rememberNavController()
@@ -71,7 +76,7 @@ fun JetMeRandomApp(
 
         NavHost(
             navController = navController,
-            startDestination = JetMeScreen.Search.name,
+            startDestination = JetMeScreen.Liked.name,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = JetMeScreen.Search.name) {
@@ -91,6 +96,12 @@ fun JetMeRandomApp(
             composable(route = JetMeScreen.Details.name) {
                 DetailsScreen(
                     searchViewModel = searchViewModel,
+                )
+            }
+            composable(route = JetMeScreen.Liked.name) {
+
+                LikedScreen(
+                    likedFlightViewModel = likedFlightViewModel,
                 )
             }
         }

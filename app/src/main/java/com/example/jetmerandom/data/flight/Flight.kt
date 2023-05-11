@@ -28,6 +28,6 @@ fun Flight.toEntity() = FlightEntity(
     imageURL = imageURL,
     price = price,
     duration = java.time.Duration.ofSeconds(duration.departure.toLong()).toString(),
-    depDate = routes[0].utc_departure.split("T")[1].dropLast(8),
-    retDate = routes.last().utc_departure.split("T")[1].dropLast(8)
+    depDate = routes[0].utc_departure.split("T")[0],
+    retDate = routes.last().utc_departure.split("T")[0]
 )

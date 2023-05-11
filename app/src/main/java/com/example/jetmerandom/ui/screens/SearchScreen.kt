@@ -15,7 +15,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetmerandom.R
 import com.example.jetmerandom.data.DataSource.cities
@@ -32,7 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
-import com.example.jetmerandom.SearchViewModel
+import com.example.jetmerandom.ui.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
 import com.example.jetmerandom.screens.components.ClockTime
 import com.example.jetmerandom.screens.components.OptionsPick

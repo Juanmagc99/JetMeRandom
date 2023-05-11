@@ -1,10 +1,11 @@
-package com.example.jetmerandom
+package com.example.jetmerandom.ui
 
 import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetmerandom.API.APIService
+import com.example.jetmerandom.R
 import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.DataSource.flights
 import com.example.jetmerandom.data.DataSource.flightsListed

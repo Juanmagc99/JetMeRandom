@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.example.jetmerandom.data.DataSource.cities
-import com.example.jetmerandom.screens.JetMeRandomApp
+import com.example.jetmerandom.ui.LikedFlightViewModel
+import com.example.jetmerandom.ui.SearchViewModel
+import com.example.jetmerandom.ui.screens.JetMeRandomAppTotal
 
 import com.example.jetmerandom.ui.theme.JetMeRandomTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,10 +24,14 @@ class MainActivity : ComponentActivity() {
         chargeLocations()
 
         val searchViewModel: SearchViewModel by viewModels()
+        val likedFlightViewModel: LikedFlightViewModel by viewModels()
 
         setContent {
             JetMeRandomTheme {
-                JetMeRandomApp(searchViewModel=  searchViewModel)
+                JetMeRandomAppTotal(
+                    searchViewModel = searchViewModel,
+                    likedFlightViewModel = likedFlightViewModel
+                )
             }
         }
     }

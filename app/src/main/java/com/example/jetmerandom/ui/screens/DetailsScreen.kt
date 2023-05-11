@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.jetmerandom.R
 
-import com.example.jetmerandom.SearchViewModel
+import com.example.jetmerandom.ui.SearchViewModel
 import com.example.jetmerandom.data.DataSource.routesLocation
 import com.example.jetmerandom.screens.components.RouteCard
 import com.google.android.gms.maps.model.CameraPosition

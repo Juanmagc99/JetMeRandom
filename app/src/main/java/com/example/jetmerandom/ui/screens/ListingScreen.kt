@@ -23,12 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.jetmerandom.data.DataSource.flightsListed
 import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.screens.components.CardRoute
+import com.example.jetmerandom.ui.SearchViewModel
 import java.time.Duration
 
 @Composable

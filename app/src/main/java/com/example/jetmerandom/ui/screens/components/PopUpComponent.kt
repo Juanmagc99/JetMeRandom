@@ -18,7 +18,7 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.window.SecureFlagPolicy
 import com.example.jetmerandom.R
-import com.example.jetmerandom.SearchViewModel
+import com.example.jetmerandom.ui.SearchViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
