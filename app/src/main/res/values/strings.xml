@@ -14,5 +14,6 @@
     <string name="searching_flights">We are searching your flights</string>
     <string name="not_found">No flights found</string>
     <string name="wrong_message">Something went wrong</string>
+    <string name="liked_bar_label">Liked flights</string>
 
 </resources>

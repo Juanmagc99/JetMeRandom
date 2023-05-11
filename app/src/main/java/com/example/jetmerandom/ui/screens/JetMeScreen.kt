@@ -7,13 +7,16 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetmerandom.ListinScreen
+import com.example.jetmerandom.R
 import com.example.jetmerandom.screens.DetailsScreen
 import com.example.jetmerandom.screens.SearchScreen
 import com.example.jetmerandom.ui.LikedFlightViewModel
@@ -31,6 +34,7 @@ enum class JetMeScreen() {
 fun JetMeRandomAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
+    navigateLiked: () -> Unit = {},
     modifier: Modifier = Modifier,
     currentScreen: String,
 ) {
@@ -45,6 +49,16 @@ fun JetMeRandomAppBar(
                         contentDescription = stringResource(com.example.jetmerandom.R.string.back_button)
                     )
                 }
+            }
+        },
+        actions = {
+            IconButton(
+                onClick =  navigateLiked,
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_save_24),
+                    contentDescription = stringResource(R.string.liked_bar_label)
+                )
             }
         }
     )
@@ -68,7 +82,8 @@ fun JetMeRandomAppTotal(
             JetMeRandomAppBar(
                 canNavigateBack = navController.previousBackStackEntry != null ,
                 navigateUp = { navController.navigateUp() },
-                currentScreen = currentScreen
+                currentScreen = currentScreen,
+                navigateLiked = { navController.navigate(JetMeScreen.Liked.name) }
             )
         }
     ) { innerPadding ->
@@ -76,7 +91,7 @@ fun JetMeRandomAppTotal(
 
         NavHost(
             navController = navController,
-            startDestination = JetMeScreen.Liked.name,
+            startDestination = JetMeScreen.Search.name,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = JetMeScreen.Search.name) {

@@ -8,6 +8,7 @@ import com.example.jetmerandom.data.flight.Fare
 import com.example.jetmerandom.data.flight.Route
 
 data class Flight(
+    val n_passengers: Int,
     val city_from: String,
     val city_to: String,
     val routes: List<Route>,
@@ -28,6 +29,8 @@ fun Flight.toEntity() = FlightEntity(
     imageURL = imageURL,
     price = price,
     duration = java.time.Duration.ofSeconds(duration.departure.toLong()).toString(),
-    depDate = routes[0].utc_departure.split("T")[0],
-    retDate = routes.last().utc_departure.split("T")[0]
+    depDate = routes[0].utc_departure,
+    retDate = routes.last().utc_departure,
+    n_stops = routes.size - 2,
+    n_passengers = n_passengers
 )

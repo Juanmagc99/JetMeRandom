@@ -141,7 +141,8 @@ class SearchViewModel @Inject constructor(
                                 price = f.price,
                                 imageURL = imageURL,
                                 currency = currency,
-                                deep_link = f.deep_link
+                                deep_link = f.deep_link,
+                                n_passengers = uiState.value.qChilds + uiState.value.qAdults
                             )
                             setDestinations.add(f.cityTo)
                             flights.add(flight)

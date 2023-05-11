@@ -82,7 +82,7 @@ fun DetailsScreen(
             IconButton(onClick = {
                 searchViewModel.onLikedFlight(state.flight)
             }) {
-                Icon(painter = painterResource(id = R.drawable.outline_push_pin_24), contentDescription = "Save a flight")
+                Icon(painter = painterResource(id = R.drawable.baseline_add_to_photos_24), contentDescription = "Save a flight")
             }
         }
 

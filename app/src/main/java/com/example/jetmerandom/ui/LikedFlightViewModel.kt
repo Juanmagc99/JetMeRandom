@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetmerandom.data.FlightLikedUiState
 import com.example.jetmerandom.data.database.entities.FlightEntity
+import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.domain.FlightsUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,17 @@ class LikedFlightViewModel @Inject constructor(
         }
     }
 
+    fun onLikedFlight(flight: Flight){
+        viewModelScope.launch {
+            flightsUseCases.insertFlight(flight)
+        }
+    }
 
+    fun onDeleteFlight(flightEntity: FlightEntity){
+        viewModelScope.launch {
+            flightsUseCases.deleteFlight(flightEntity)
+            getAllFlights()
+        }
+    }
 
 }

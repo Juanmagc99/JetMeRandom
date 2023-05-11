@@ -21,5 +21,7 @@ data class FlightEntity(
     val imageURL: String,
     val currency: String,
     val deep_link: String,
+    val n_stops: Int,
+    val n_passengers: Int
 )
 
