@@ -65,7 +65,7 @@ fun FlightItem(flight: FlightEntity, likedFlightViewModel: LikedFlightViewModel)
             .clip(RoundedCornerShape(15))
             .combinedClickable(
                 onClick = {
-                    handler.openUri(flight.deep_link)
+                    showDialog = true
                 },
                 onLongClick = {
                     showDialog = true

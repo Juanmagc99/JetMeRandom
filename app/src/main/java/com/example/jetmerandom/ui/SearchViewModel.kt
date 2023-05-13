@@ -9,6 +9,7 @@ import com.example.jetmerandom.R
 import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.DataSource.flights
 import com.example.jetmerandom.data.DataSource.flightsListed
+import com.example.jetmerandom.data.DataSource.flightsToCompare
 import com.example.jetmerandom.data.DataSource.routesLocation
 import com.example.jetmerandom.data.flight.Flight
 import com.example.jetmerandom.data.SearchUiState
@@ -166,6 +167,23 @@ class SearchViewModel @Inject constructor(
         }
     }
 
+    fun setToCompare(flight: Flight){
+        if (flightsToCompare.contains(flight)){
+            flightsToCompare.remove(flight)
+        } else {
+            flightsToCompare.add(flight)
+        }
+
+        val currentState = _uiState.value
+        if (flightsToCompare.size >= 2){
+            println("hola")
+            _uiState.value = currentState.copy(readyToCompare = true)
+        } else {
+            _uiState.value = currentState.copy(readyToCompare = false)
+        }
+    }
+
+
     fun procesingFlights(flights: List<Flight>, destinations: Set<String>){
         flightsListed.clear()
         for (d in destinations){
@@ -218,11 +236,6 @@ class SearchViewModel @Inject constructor(
             _uiState.value = currentState.copy(checkCityExists = true)
         }
 
-        if (actualCity.isBlank()){
-            _uiState.value = currentState.copy(checkCityIsntBlank = true)
-        } else {
-            _uiState.value = currentState.copy(checkCityIsntBlank = false)
-        }
     }
 
 

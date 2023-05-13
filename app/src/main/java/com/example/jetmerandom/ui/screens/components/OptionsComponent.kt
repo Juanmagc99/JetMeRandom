@@ -48,19 +48,19 @@ fun OptionsPick(viewModel: SearchViewModel){
     
     val options = listOf(
         Option(
-            IconSource(R.drawable.baseline_navigate_next_24),
+            IconSource(R.drawable.icons8_21_bank_58),
             titleText = "Economy"
         ),
         Option(
-            IconSource(R.drawable.baseline_navigate_next_24),
+            IconSource(R.drawable.icons8_cash_64),
             titleText = "Economy premium",
         ),
         Option(
-            IconSource(R.drawable.baseline_navigate_next_24),
+            IconSource(R.drawable.icons8_wallet_50),
             titleText = "Business",
         ),
         Option(
-            IconSource(R.drawable.baseline_navigate_next_24),
+            IconSource(R.drawable.icons8_suit_50),
             titleText = "First class",
         ),
     )

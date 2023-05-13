@@ -36,6 +36,7 @@ data class SearchUiState(
 
     val rarrTime: LocalTime = LocalTime.of(23,59),
 
+    val readyToCompare: Boolean = false,
 
     /*
     *

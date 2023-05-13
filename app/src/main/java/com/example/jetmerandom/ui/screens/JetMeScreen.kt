@@ -17,6 +17,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetmerandom.ListinScreen
 import com.example.jetmerandom.R
+import com.example.jetmerandom.data.DataSource.flightsToCompare
 import com.example.jetmerandom.screens.DetailsScreen
 import com.example.jetmerandom.screens.SearchScreen
 import com.example.jetmerandom.ui.LikedFlightViewModel
@@ -27,7 +28,8 @@ enum class JetMeScreen() {
     Search,
     Listing,
     Details,
-    Liked
+    Liked,
+    Comparate
 }
 
 @Composable
@@ -35,9 +37,14 @@ fun JetMeRandomAppBar(
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     navigateLiked: () -> Unit = {},
+    navigateComparator: () -> Unit = {},
     modifier: Modifier = Modifier,
     currentScreen: String,
+    viewModel: SearchViewModel
 ) {
+
+    var compare = viewModel.uiState.collectAsState().value.readyToCompare
+
     TopAppBar(
         title = { Text(stringResource(com.example.jetmerandom.R.string.app_name)) },
         modifier = modifier,
@@ -59,6 +66,16 @@ fun JetMeRandomAppBar(
                     painter = painterResource(id = R.drawable.baseline_save_24),
                     contentDescription = stringResource(R.string.liked_bar_label)
                 )
+            }
+            if (currentScreen == JetMeScreen.Listing.name && compare){
+                IconButton(
+                    onClick =  navigateComparator,
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.icons8_compare_64),
+                        contentDescription = stringResource(R.string.liked_bar_label)
+                    )
+                }
             }
         }
     )
@@ -83,7 +100,9 @@ fun JetMeRandomAppTotal(
                 canNavigateBack = navController.previousBackStackEntry != null ,
                 navigateUp = { navController.navigateUp() },
                 currentScreen = currentScreen,
-                navigateLiked = { navController.navigate(JetMeScreen.Liked.name) }
+                navigateLiked = { navController.navigate(JetMeScreen.Liked.name) },
+                navigateComparator = { navController.navigate(JetMeScreen.Comparate.name) },
+                viewModel = searchViewModel
             )
         }
     ) { innerPadding ->
@@ -117,6 +136,12 @@ fun JetMeRandomAppTotal(
 
                 LikedScreen(
                     likedFlightViewModel = likedFlightViewModel,
+                )
+            }
+            composable(route = JetMeScreen.Comparate.name) {
+
+                CompareScreen(
+                    searchViewModel = searchViewModel,
                 )
             }
         }

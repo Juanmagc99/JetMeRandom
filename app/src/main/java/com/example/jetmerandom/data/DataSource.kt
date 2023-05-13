@@ -12,4 +12,6 @@ object DataSource {
     val flightsListed = mutableMapOf<String, List<Flight>>()
 
     val routesLocation = mutableMapOf<String,LatLng>()
+
+    val flightsToCompare = mutableListOf<Flight>()
 }

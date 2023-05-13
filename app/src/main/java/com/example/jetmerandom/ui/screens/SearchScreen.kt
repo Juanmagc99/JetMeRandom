@@ -1,6 +1,7 @@
 package com.example.jetmerandom.screens
 
 import HeadOptions
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
@@ -26,15 +27,18 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.jetmerandom.ui.SearchViewModel
 import com.example.jetmerandom.screens.components.AutoCompleteSelect
 import com.example.jetmerandom.screens.components.ClockTime
 import com.example.jetmerandom.screens.components.OptionsPick
+import com.maxkeppeker.sheets.core.models.base.IconSource
 import com.maxkeppeker.sheets.core.models.base.rememberSheetState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
@@ -46,7 +50,7 @@ import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 fun SearchScreen(
     viewModel: SearchViewModel,
     onNextButtonClicked: () -> Unit = {},
-){
+) {
 
     val mContext = LocalContext.current
 
@@ -55,18 +59,19 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
 
     var minNights by remember {
-        mutableStateOf("")
+        mutableStateOf(state.minTime.toString())
     }
 
     var maxHours by remember {
-        mutableStateOf("")
+        mutableStateOf(state.maxHours.toString())
     }
+
 
     var price by remember { mutableStateOf(80.0f..300.0f) }
 
     val scrollState = rememberScrollState()
 
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp, start = 25.dp, end = 20.dp)
@@ -84,98 +89,124 @@ fun SearchScreen(
         )
 
         Spacer(modifier = Modifier.padding(5.dp))
-
-        AutoCompleteSelect(
-            "From",
-            cities,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                }
-            ),
-            viewModel = viewModel
-        )
-
-
-        EditNumberField(
-            modifier = Modifier
-                .width(145.dp),
-            value = minNights,
-            onValueChange = {
-                minNights = it
-                if (it.isNotBlank() && !it.contains("-")
-                    && !it.contains("+") && it.toIntOrNull() != null) {
-                    viewModel.setMinNights(it.toInt())
-                } else {
-                    viewModel.setMinNights(-1)
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next,
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.clearFocus()
-                    if (minNights.isNotBlank() && !minNights.contains("-")
-                        && minNights.contains("+") && minNights.toIntOrNull() != null) {
-                        viewModel.setMaxHours(minNights.toInt())
-                    } else {
-                        viewModel.setMaxHours(-1)
+        Row() {
+            AutoCompleteSelect(
+                "From",
+                cities,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
                     }
-                }
-            ),
-            labelResourceId = R.string.nights_label,
-            iconResourceId = R.drawable.baseline_access_time_24,
-            viewModel = viewModel
-        )
-
-        if(!viewModel.uiState.collectAsState().value.checkDays){
+                ),
+                viewModel = viewModel
+            )
             Text(
-                text = "You must input positive integer only",
+                text = "*",
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+
+        Row {
+            EditNumberField(
+                modifier = Modifier
+                    .width(145.dp),
+                value = minNights,
+                onValueChange = {
+                    minNights = it
+                    if (it.isNotBlank() && !it.contains("-")
+                        && !it.contains("+") && it.toIntOrNull() != null
+                    ) {
+                        viewModel.setMinNights(it.toInt())
+                    } else {
+                        viewModel.setMinNights(-1)
+                    }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next,
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.clearFocus()
+                        if (minNights.isNotBlank() && !minNights.contains("-")
+                            && minNights.contains("+") && minNights.toIntOrNull() != null
+                        ) {
+                            viewModel.setMaxHours(minNights.toInt())
+                        } else {
+                            viewModel.setMaxHours(-1)
+                        }
+                    }
+                ),
+                labelResourceId = R.string.nights_label,
+                iconResourceId = R.drawable.baseline_access_time_24,
+                viewModel = viewModel
+            )
+            Text(
+                text = "*",
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
+        if (!viewModel.uiState.collectAsState().value.checkDays) {
+            Text(
+                text = "You must input positive integers only",
                 color = Color.Red,
                 fontSize = 12.sp
             )
         }
 
-        EditNumberField(
-            modifier = Modifier
-                .width(145.dp),
-            value = maxHours,
-            onValueChange = {
-                maxHours = it
-                if (it.isNotBlank() && !it.contains("-")
-                    && !it.contains("+") && it.toIntOrNull() != null) {
-                    viewModel.setMaxHours(it.toInt())
-                } else {
-                    viewModel.setMaxHours(-1)
-                }
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    if (maxHours.isNotBlank() && !maxHours.contains("-")
-                        && !maxHours.contains("+") && maxHours.toIntOrNull() != null) {
-                        viewModel.setMaxHours(maxHours.toInt())
+        Row() {
+            EditNumberField(
+                modifier = Modifier
+                    .width(145.dp),
+                value = maxHours,
+                onValueChange = {
+                    maxHours = it
+                    if (it.isNotBlank() && !it.contains("-")
+                        && !it.contains("+") && it.toIntOrNull() != null
+                    ) {
+                        viewModel.setMaxHours(it.toInt())
                     } else {
                         viewModel.setMaxHours(-1)
                     }
-                }
-            ),
-            labelResourceId = R.string.hours_label,
-            iconResourceId = R.drawable.baseline_access_time_24,
-            viewModel = viewModel
-        )
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        if (maxHours.isNotBlank() && !maxHours.contains("-")
+                            && !maxHours.contains("+") && maxHours.toIntOrNull() != null
+                        ) {
+                            viewModel.setMaxHours(maxHours.toInt())
+                        } else {
+                            viewModel.setMaxHours(-1)
+                        }
+                    }
+                ),
+                labelResourceId = R.string.hours_label,
+                iconResourceId = R.drawable.baseline_access_time_24,
+                viewModel = viewModel
+            )
+            Text(
+                text = "*",
+                fontWeight = FontWeight.Bold,
+                fontSize = 25.sp,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+        }
 
-        if(!viewModel.uiState.collectAsState().value.checkHours){
+
+        if (!viewModel.uiState.collectAsState().value.checkHours) {
             Text(
                 text = "You must input positive integer only",
                 color = Color.Red,
@@ -259,22 +290,39 @@ fun SearchScreen(
 
         OptionsPick(viewModel)
 
-        Button(
-            onClick = {
-                viewModel.getFlights(onNextButtonClicked, mContext = mContext)
-                println(state)
-            },
+        if (state.origin != "" && (state.checkHours && state.checkDates
+                    && state.checkCityExists && state.checkDays && state.checkCityIsntBlank && state.checkDates)
         ) {
-            Text(text = "Search", fontSize = 22.sp)
-            Icon(
-                painter = painterResource(id = R.drawable.baseline_navigate_next_24),
-                contentDescription = null
-            )
+            Button(
+                onClick = {
+                    viewModel.getFlights(onNextButtonClicked, mContext = mContext)
+                    println(state)
+                },
+            ) {
+                Text(text = "Search", fontSize = 22.sp)
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_navigate_next_24),
+                    contentDescription = null
+                )
+            }
+        } else {
+            Button(
+                onClick = {
+                    println(state)
+                    Toast.makeText(mContext,"Some fields arent correct", Toast.LENGTH_LONG).show()
+                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color.Gray)
+            ) {
+                Text(text = "Search", fontSize = 22.sp)
+                Icon(
+                    painter = painterResource(id = R.drawable.baseline_navigate_next_24),
+                    contentDescription = null
+                )
+            }
         }
     }
 
 }
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -283,17 +331,17 @@ fun PriceRange(
     price: ClosedFloatingPointRange<Float>,
     onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
     viewModel: SearchViewModel
-){
+) {
     val range = 10.0f..1500.0f
 
     Column() {
         RangeSlider(
             value = price,
             valueRange = range,
-            onValueChange =  {
+            onValueChange = {
                 onValueChange(it)
                 viewModel.setPriceRange(price.start, price.endInclusive)
-                             },
+            },
             steps = 15
         )
         Row(
@@ -322,7 +370,7 @@ fun EditNumberField(
     keyboardActions: KeyboardActions,
     viewModel: SearchViewModel,
     @DrawableRes iconResourceId: Int,
-){
+) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

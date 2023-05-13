@@ -92,6 +92,7 @@ fun DetailsScreen(
             modifier = Modifier.fillMaxWidth(),
             onClick = { handler.openUri(state.flight.deep_link) }
         ) {
+            Icon(painter = painterResource(id = R.drawable.icons8_buy_64), contentDescription = "buy icon")
             Text(text = "Buy it")
         }
 
@@ -140,12 +141,12 @@ fun DetailsCard(viewModel: SearchViewModel){
                 )
                 CardInfoRow(
                     text1 = "Time to arrive: ",
-                    text2 = Duration.ofSeconds(flight.duration.departure.toLong()).toString()
+                    text2 = Duration.ofSeconds(flight.duration.departure.toLong()).toString().drop(2)
                 )
 
                 CardInfoRow(
                     text1 = "Time to return: ",
-                    text2 = Duration.ofSeconds(flight.duration.`return`.toLong()).toString()
+                    text2 = Duration.ofSeconds(flight.duration.`return`.toLong()).toString().drop(2)
                 )
                 Text(
                     text = stringResource(R.string.prices),

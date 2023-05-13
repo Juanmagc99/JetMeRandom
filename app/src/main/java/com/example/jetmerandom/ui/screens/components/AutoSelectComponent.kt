@@ -54,7 +54,7 @@ fun AutoCompleteSelect(
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             maxLines = 1,
             keyboardActions = keyboardActions,
-            keyboardOptions = keyboardOptions
+            keyboardOptions = keyboardOptions,
         )
 
         val optionsFiltered =
