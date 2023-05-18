@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.jetmerandom.API.APIService
+import com.example.jetmerandom.data.network.APIClients
 import com.example.jetmerandom.R
 import com.example.jetmerandom.data.DataSource
 import com.example.jetmerandom.data.DataSource.flights
@@ -35,21 +35,15 @@ import kotlin.streams.toList
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val flightsUseCases: FlightsUseCases
-): ViewModel(){
+    private val flightsUseCases: FlightsUseCases,
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
 
 
-    fun getRetrofit(): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl("https://api.tequila.kiwi.com/v2/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }
 
-    fun onLikedFlight(flight: Flight){
+    fun onLikedFlight(flight: Flight) {
         viewModelScope.launch {
             flightsUseCases.insertFlight(flight)
         }
@@ -60,49 +54,45 @@ class SearchViewModel @Inject constructor(
         routesLocation.clear()
         val flight = uiState.value.flight
         CoroutineScope(Dispatchers.IO).launch {
-            val call = getRetrofit().create(APIService::class.java)
-            for (r in flight!!.routes){
-                val location_departure_call = call.getCitiesLocation(r.cityFrom.replace(","," "))
-                println(location_departure_call)
-                val location_arrival_call = call.getCitiesLocation(r.cityTo.replace(","," "))
-                println(location_arrival_call)
-                if (location_departure_call.isSuccessful && location_arrival_call.isSuccessful){
-                    print("LLamada exitosa a position")
-                    val locationDeparture = location_departure_call.body()?.data?.get(0)
-                    val locationArrival = location_arrival_call.body()?.data?.get(0)
-                    if (locationDeparture != null && locationArrival != null) {
-                        routesLocation[r.cityFrom] = LatLng(locationDeparture.latitude,locationDeparture.longitude)
-                        routesLocation[r.cityTo] = LatLng(locationArrival.latitude,locationArrival.longitude)
-                    }
-                    withContext(Dispatchers.Main){
-                        onDetailsButtonClicked()
-                    }
-                }else {
-                    println("\n\nFALLO EN EL SERVIDOR NO SE HAN ENCONTRADO LAS COORDENADAS\n\n")
+            if (flight != null ){
+                flightsUseCases.getFlightRoutes(flight)
+
+                withContext(Dispatchers.Main) {
+                    onDetailsButtonClicked()
                 }
             }
-            println(routesLocation)
+
         }
     }
 
+
     fun getFlights(onNextButtonClicked: () -> Unit = {}, mContext: Context) {
         flights.clear()
-        makeAToast(R.string.searching_flights,mContext)
-        println(uiState.value.maxHours)
-        CoroutineScope(Dispatchers.IO).launch{
-            val call = getRetrofit().create(APIService::class.java).getFlights(
-                apiKey = "dzH-q3MBLRRtJFFmcKPvBHqML_YdCEfB",
+        flightsToCompare.clear()
+        makeAToast(R.string.searching_flights, mContext)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            flightsUseCases.getFlightsNet(
                 fly_from = uiState.value.origin.split("-")[0].dropLast(1),
                 date_from = formatDate(uiState.value.startDate.toString()),
-                date_to = formatDate(uiState.value.endDate.minusDays(uiState.value.minTime.toLong()).toString()),
-                return_from = formatDate(uiState.value.startDate.plusDays(uiState.value.minTime.toLong()).toString()),
+                date_to = formatDate(
+                    uiState.value.endDate.minusDays(uiState.value.minTime.toLong()).toString()
+                ),
+                return_from = formatDate(
+                    uiState.value.startDate.plusDays(uiState.value.minTime.toLong()).toString()
+                ),
                 return_to = formatDate(uiState.value.endDate.toString()),
                 flight_type = "round",
                 nights_in_dst_from = uiState.value.minTime,
-                nights_in_dst_to = Period.between(uiState.value.startDate,uiState.value.endDate).days,
+                nights_in_dst_to = Period.between(
+                    uiState.value.startDate,
+                    uiState.value.endDate
+                ).days,
                 price_from = uiState.value.minPrice.toInt(),
                 price_to = uiState.value.maxPrice.toInt(),
-                max_stopovers = if (uiState.value.isDirect) 0 else {2},
+                max_stopovers = if (uiState.value.isDirect) 0 else {
+                    2
+                },
                 adults = uiState.value.qAdults,
                 children = uiState.value.qChilds,
                 dtime_to = uiState.value.depTime.toString(),
@@ -111,71 +101,25 @@ class SearchViewModel @Inject constructor(
                 ret_atime_to = uiState.value.rarrTime.toString(),
                 selected_cabins = uiState.value.cabinType,
                 max_fly_duration = uiState.value.maxHours,
-                limit = 100,
+                limit = 100
             )
-            if (call.isSuccessful){
-                println(call)
-                val flights_to_add = call.body()?.data
-                val flights_filtered = flights_to_add
-                    ?.stream()
-                    ?.filter(Predicate { f -> f.availability.seats >= uiState.value.qChilds + uiState.value.qAdults })
-                    ?.toList()
 
-                if (flights_filtered != null) {
-                    if(flights_filtered.isNotEmpty()){
-                        var setDestinations = mutableSetOf<String>()
-                        val currency = call.body()!!.currency
-                        for (f in flights_filtered) {
-                            val call_image = getRetrofit().create(APIService::class.java)
-                                .getImage(f.cityTo.lowercase())
-                            var imageURL = "https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-1-scaled.png"
-                            println(call_image)
-                            if (call_image.isSuccessful){
-                                imageURL = call_image.body()?.photos?.get(0)?.image?.mobile.toString()
-                            }
-                            val flight = Flight(
-                                city_from = f.cityFrom,
-                                city_to = f.cityTo,
-                                duration = f.duration,
-                                fare = f.fare,
-                                routes = f.route,
-                                price = f.price,
-                                imageURL = imageURL,
-                                currency = currency,
-                                deep_link = f.deep_link,
-                                n_passengers = uiState.value.qChilds + uiState.value.qAdults
-                            )
-                            setDestinations.add(f.cityTo)
-                            flights.add(flight)
-                            procesingFlights(flights = flights, destinations = setDestinations)
-                        }
-                        withContext(Dispatchers.Main){
-                            onNextButtonClicked()
-                        }
-                    }
-                } else {
-                    withContext(Dispatchers.Main){
-                        makeAToast(R.string.not_found,mContext)
-                    }
-                }
-            } else {
-                println(call)
-                withContext(Dispatchers.Main){
-                    makeAToast(R.string.wrong_message,mContext)
-                }
+            withContext(Dispatchers.Main){
+                onNextButtonClicked()
             }
         }
     }
 
-    fun setToCompare(flight: Flight){
-        if (flightsToCompare.contains(flight)){
+
+    fun setToCompare(flight: Flight) {
+        if (flightsToCompare.contains(flight)) {
             flightsToCompare.remove(flight)
         } else {
             flightsToCompare.add(flight)
         }
 
         val currentState = _uiState.value
-        if (flightsToCompare.size >= 2){
+        if (flightsToCompare.size >= 2) {
             println("hola")
             _uiState.value = currentState.copy(readyToCompare = true)
         } else {
@@ -184,9 +128,9 @@ class SearchViewModel @Inject constructor(
     }
 
 
-    fun procesingFlights(flights: List<Flight>, destinations: Set<String>){
+    fun procesingFlights(flights: List<Flight>, destinations: Set<String>) {
         flightsListed.clear()
-        for (d in destinations){
+        for (d in destinations) {
             flightsListed[d] = flights
                 .stream()
                 .filter { f -> f.city_to == d }
@@ -194,19 +138,19 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun makeAToast(idString:Int, mContext: Context){
-        Toast.makeText(mContext,idString, Toast.LENGTH_LONG).show()
+    fun makeAToast(idString: Int, mContext: Context) {
+        Toast.makeText(mContext, idString, Toast.LENGTH_LONG).show()
     }
 
-    fun checkDates(){
+    fun checkDates() {
         val currentState = _uiState.value
         val start = uiState.value.startDate
         val end = uiState.value.endDate
 
 
-        if (end.minusDays(uiState.value.minTime.toLong()) <= start){
+        if (end.minusDays(uiState.value.minTime.toLong()) <= start) {
             _uiState.value = currentState.copy(checkDates = false)
-        }else {
+        } else {
             _uiState.value = currentState.copy(checkDates = true)
         }
     }
@@ -217,20 +161,20 @@ class SearchViewModel @Inject constructor(
         return dateSplit[2] + "/" + dateSplit[1] + "/" + dateSplit[0]
     }
 
-    fun checkPassengers(){
+    fun checkPassengers() {
         val currentState = _uiState.value
-        if (uiState.value.qAdults + uiState.value.qChilds > 0){
+        if (uiState.value.qAdults + uiState.value.qChilds > 0) {
             _uiState.value = currentState.copy(checkPassengers = true)
         } else {
             _uiState.value = currentState.copy(checkPassengers = false)
         }
     }
 
-    fun checkOrigin(){
+    fun checkOrigin() {
         val currentState = _uiState.value
         val actualCity = uiState.value.origin
 
-        if (!DataSource.cities.contains(actualCity) && actualCity.isNotBlank()){
+        if (!DataSource.cities.contains(actualCity) && actualCity.isNotBlank()) {
             _uiState.value = currentState.copy(checkCityExists = false)
         } else {
             _uiState.value = currentState.copy(checkCityExists = true)
@@ -239,14 +183,15 @@ class SearchViewModel @Inject constructor(
     }
 
 
-    fun setFligthDetails(flight: Flight){
+    fun setFligthDetails(flight: Flight) {
         val currentState = _uiState.value
 
         _uiState.value = currentState.copy(flight = flight)
     }
+
     fun setDate(date: LocalDate, flag: String) {
         val currentState = _uiState.value
-        if (flag == "Start"){
+        if (flag == "Start") {
             _uiState.value = currentState.copy(startDate = date)
         } else {
             _uiState.value = currentState.copy(endDate = date)
@@ -255,14 +200,14 @@ class SearchViewModel @Inject constructor(
         checkDates()
     }
 
-    fun setCabins(cabinType: String){
+    fun setCabins(cabinType: String) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(cabinType = cabinType)
     }
 
-    fun setMinNights(minTime: Int){
+    fun setMinNights(minTime: Int) {
         val currentState = _uiState.value
-        if (minTime >= 0){
+        if (minTime >= 0) {
             _uiState.value = currentState.copy(minTime = minTime, checkDays = true)
         } else {
             _uiState.value = currentState.copy(checkDays = false)
@@ -272,17 +217,17 @@ class SearchViewModel @Inject constructor(
         checkDates()
     }
 
-    fun setMaxHours(maxHours: Int){
+    fun setMaxHours(maxHours: Int) {
         val currentState = _uiState.value
-        if (maxHours >= 0){
-            _uiState.value = currentState.copy(maxHours = maxHours,checkHours = true)
+        if (maxHours >= 0) {
+            _uiState.value = currentState.copy(maxHours = maxHours, checkHours = true)
         } else {
             _uiState.value = currentState.copy(checkHours = false)
         }
 
     }
 
-    fun setPriceRange(start:Float, end:Float){
+    fun setPriceRange(start: Float, end: Float) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(minPrice = start, maxPrice = end)
     }
@@ -301,7 +246,7 @@ class SearchViewModel @Inject constructor(
 
     fun setPassenger(nPassenger: Int, flag: String) {
         val currentState = _uiState.value
-        if (flag == "Adult"){
+        if (flag == "Adult") {
             _uiState.value = currentState.copy(qAdults = nPassenger)
         } else {
             _uiState.value = currentState.copy(qChilds = nPassenger)
@@ -310,22 +255,22 @@ class SearchViewModel @Inject constructor(
         checkPassengers()
     }
 
-    fun setDepTime(depTime: LocalTime){
+    fun setDepTime(depTime: LocalTime) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(depTime = depTime)
     }
 
-    fun setArrTime(arrTime: LocalTime){
+    fun setArrTime(arrTime: LocalTime) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(arrTime = arrTime)
     }
 
-    fun setrDepTime(depTime: LocalTime){
+    fun setrDepTime(depTime: LocalTime) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(rdepTime = depTime)
     }
 
-    fun setrArrTime(arrTime: LocalTime){
+    fun setrArrTime(arrTime: LocalTime) {
         val currentState = _uiState.value
         _uiState.value = currentState.copy(rarrTime = arrTime)
     }

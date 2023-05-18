@@ -6,6 +6,9 @@ plugins {
     id 'kotlin-kapt'
 }
 
+
+
+
 android {
     namespace 'com.example.jetmerandom'
     compileSdk 33
@@ -21,7 +24,16 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("local.properties").newDataInputStream())
+
+        buildConfigField("String", "KIWI_API_KEY", properties.getProperty("KIWI_API_KEY"))
+        buildConfigField("String", "LOCATION_API_KEY", properties.getProperty("LOCATION_API_KEY"))
+
     }
+
 
     kapt {
         correctErrorTypes true
@@ -51,6 +63,9 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+
+
+
 }
 
 dependencies {

@@ -1,18 +1,22 @@
-package com.example.jetmerandom.API
+package com.example.jetmerandom.data.network
 
 
+import com.example.jetmerandom.BuildConfig
 import com.example.jetmerandom.data.flight.FlightsResponse
 import com.example.jetmerandom.data.image.ImageResponse
 import com.example.jetmerandom.data.position.LocationResponse
+import dagger.Provides
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface APIService {
 
-    @GET("search")
+interface APIClients {
+
+
+    @GET("https://api.tequila.kiwi.com/v2/search")
     suspend fun getFlights(
         @Query("fly_from") fly_from:String,
         @Query("date_from") date_from:String,
@@ -44,9 +48,9 @@ interface APIService {
         @Path("city_name") city_name:String,
     ): Response<ImageResponse>
 
-    @GET("http://api.positionstack.com/v1/forward?access_key=e4b9d40ee5bd077711b0d8ef32bbc534")
+    @GET("http://api.positionstack.com/v1/forward")
     suspend fun getCitiesLocation(
-        @Query("query") city_name:String,
+        @Query("query") city_name:String,@Query("access_key") location_api:String
     ): Response<LocationResponse>
 
 
