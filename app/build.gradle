@@ -4,6 +4,7 @@ plugins {
     id 'com.google.devtools.ksp' version '1.8.0-1.0.8'
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 
@@ -31,6 +32,7 @@ android {
 
         buildConfigField("String", "KIWI_API_KEY", properties.getProperty("KIWI_API_KEY"))
         buildConfigField("String", "LOCATION_API_KEY", properties.getProperty("LOCATION_API_KEY"))
+        buildConfigField("String", "MAPS_API_KEY", properties.getProperty("MAPS_API_KEY"))
 
     }
 
