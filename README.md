@@ -4,13 +4,17 @@
 This is an Android project developed using Jetpack Compose, designed to provide users with information about flight prices. It is suitable for beginners as it provides a simple example of implementing Jetpack Compose in an Android application.
 
 
-![searchScreen](https://github.com/Juanmagc99/JetMeRandom/assets/61785593/2f2e861c-8017-44eb-9572-89c79e24f3af)
-![liked](https://github.com/Juanmagc99/JetMeRandom/assets/61785593/f77672d2-91b1-4335-80c7-1640c068031f)
+![searchScreen](https://github.com/Juanmagc99/JetMeRandom/assets/61785593/8d43596c-34cf-456c-b17f-4c92098bf9ae)
+![liked](https://github.com/Juanmagc99/JetMeRandom/assets/61785593/95202ac0-dfeb-40ae-a43e-d038d3bd6d5e)
 
 
-https://github.com/Juanmagc99/JetMeRandom/assets/61785593/ea45b0f4-ff7c-473a-b531-313815cf9428
 
-https://github.com/Juanmagc99/JetMeRandom/assets/61785593/3470adba-b9af-44aa-be98-64d11e4f2608
+https://github.com/Juanmagc99/JetMeRandom/assets/61785593/7f9d0a92-a90d-4c1e-81cb-827002a64a13
+
+
+
+https://github.com/Juanmagc99/JetMeRandom/assets/61785593/40f2a71a-8935-439e-b221-def4e28e43a7
+
 
 
 ## Features
