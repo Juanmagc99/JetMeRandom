@@ -3,8 +3,6 @@ package com.example.jetmerandom.di
 import android.content.Context
 import androidx.room.Room
 import com.example.jetmerandom.data.database.FlightDatabase
-import com.example.jetmerandom.data.database.FlightRepository
-import com.example.jetmerandom.data.database.dao.FlightDao
 import com.example.jetmerandom.data.network.APIClients
 import dagger.Module
 import dagger.Provides
@@ -18,7 +16,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RoomModule {
+object AppModule {
 
     private const val FLIGHT_DB_NAME = "flight_database"
 

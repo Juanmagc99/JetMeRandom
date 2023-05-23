@@ -1,18 +1,20 @@
 package com.example.jetmerandom.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +45,11 @@ fun DetailsScreen(
         position = CameraPosition.fromLatLngZoom(from, 10f)
     }
 
+    var flightAdded by remember {
+        mutableStateOf(false)
+    }
+
+    val mContext = LocalContext.current
     val scrollState = rememberScrollState()
 
     val routesList = routesLocation.values.toList()
@@ -79,10 +86,18 @@ fun DetailsScreen(
                     style = MaterialTheme.typography.h6,
                 )
             }
-            IconButton(onClick = {
+            IconButton(onClick = { if (!flightAdded){
                 searchViewModel.onLikedFlight(state.flight)
+                Toast.makeText(mContext, "Flight add to your liked list",Toast.LENGTH_LONG).show()
+                flightAdded = true
+            }
             }) {
-                Icon(painter = painterResource(id = R.drawable.baseline_add_to_photos_24), contentDescription = "Save a flight")
+                if (!flightAdded){
+                    Icon(painter = painterResource(id = R.drawable.outline_add_to_photos_24), contentDescription = "Save a flight")
+                } else {
+                    Icon(painter = painterResource(id = R.drawable.baseline_add_to_photos_24), contentDescription = "Save a flight")
+                }
+
             }
         }
 
